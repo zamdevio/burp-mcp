@@ -2,7 +2,7 @@
 
 **Approach:** Montoya where it exists + **stateless** Swing discovery from `suiteFrame()`. **No** Repeater manager, registry, cache, or shadow state.
 
-**Status:** Tab list + read/write **working on live Burp** (2026.x); **enforce** select/settle/restore + Send **in progress** (see [`focus.md`](focus.md)).
+**Status:** Tab list + read/write **working on live Burp** (2026.x); **enforce** select/settle/restore **in code** (see [`focus.md`](focus.md)); Send **next**.
 
 ---
 
@@ -64,17 +64,19 @@ Burp remains the **only** source of truth — re-discover on every tool call.
 
 ---
 
-## Enforce (current work)
+## Enforce
 
 | Step | Behavior |
 |------|----------|
 | Select | Suite **Repeater** + message tab index |
-| Settle | Minimal EDT wait / content-stable heuristic (fast, bounded) |
-| Act | Read or write request/response |
+| Settle | Minimal EDT wait / content-stable heuristic (fast, bounded) — `RepeaterTabSession` |
+| Act | Read or write request/response **while selected** |
 | Restore | Prior Repeater tab + prior suite tool tab (**default on**) |
 | Errors | Stable messages for agents: not found, editor ambiguous, editor did not update, retry hint |
 
 **UX:** Visible tab may flicker briefly; user ends on **restored** selection.
+
+**Code:** `repeater/RepeaterTabSession.kt` + tab-targeted methods in `RepeaterUiDiscovery`.
 
 ---
 

@@ -50,6 +50,8 @@ internal object RepeaterUiDiscovery {
         class ResponseEditorMissing : DiscoveryError("<No response available>")
         class NotEditable : DiscoveryError("<Current editor is not editable>")
         class NotInRepeater : DiscoveryError("<No active Repeater tab>")
+        class EditorDidNotUpdate :
+            DiscoveryError("<Repeater editor did not update; retry list_repeater_tabs then the operation>")
     }
 
     sealed class Outcome<out T> {
@@ -106,73 +108,68 @@ internal object RepeaterUiDiscovery {
             is Outcome.Ok -> {
                 val (discovered, index) = resolved.value
                 val strip = discovered.tabStrip
-                val editors = findEditorsForTab(discovered, index)
-                if (editors.requestAmbiguous) {
-                    return@runOnEdt Outcome.Err(DiscoveryError.AmbiguousRequestEditor())
-                }
-                if (editors.responseAmbiguous) {
-                    return@runOnEdt Outcome.Err(DiscoveryError.AmbiguousResponseEditor())
-                }
-                val requestText = editors.request?.text
-                val responseText = editors.response?.text
-                val responseAvailable = isResponseAvailable(responseText)
-                Outcome.Ok(
-                    RepeaterTabDetail(
-                        id = RepeaterTabId.fromIndex(index),
-                        name = tabTitle(strip, index),
-                        index = index,
-                        selected = strip.selectedIndex == index,
-                        request = requestText,
-                        response = if (responseAvailable) responseText else null,
-                        requestAvailable = editors.request != null,
-                        responseAvailable = responseAvailable,
+                // Capture selection before session; after restore we report whether
+                // the target was originally selected.
+                val wasSelected = strip.selectedIndex == index
+                RepeaterTabSession.withTab(discovered, index) {
+                    val editors = findEditorsWhileSelected(discovered, index)
+                    if (editors.requestAmbiguous) {
+                        return@withTab Outcome.Err(DiscoveryError.AmbiguousRequestEditor())
+                    }
+                    if (editors.responseAmbiguous) {
+                        return@withTab Outcome.Err(DiscoveryError.AmbiguousResponseEditor())
+                    }
+                    val requestText = editors.request?.text
+                    val responseText = editors.response?.text
+                    val responseAvailable = isResponseAvailable(responseText)
+                    Outcome.Ok(
+                        RepeaterTabDetail(
+                            id = RepeaterTabId.fromIndex(index),
+                            name = tabTitle(strip, index),
+                            index = index,
+                            selected = wasSelected,
+                            request = requestText,
+                            response = if (responseAvailable) responseText else null,
+                            requestAvailable = editors.request != null,
+                            responseAvailable = responseAvailable,
+                        )
                     )
-                )
+                }
             }
         }
     }
 
     fun getTabRequest(api: MontoyaApi, tabId: String): Outcome<String> = runOnEdt {
-        when (val editors = resolveEditors(api, tabId)) {
-            is Outcome.Err -> editors
+        when (val resolved = resolveTab(api, tabId)) {
+            is Outcome.Err -> resolved
             is Outcome.Ok -> {
-                val e = editors.value
-                when {
-                    e.requestAmbiguous -> Outcome.Err(DiscoveryError.AmbiguousRequestEditor())
-                    e.request == null -> Outcome.Err(DiscoveryError.RequestEditorMissing())
-                    else -> Outcome.Ok(e.request.text)
+                val (discovered, index) = resolved.value
+                RepeaterTabSession.withTab(discovered, index) {
+                    readRequestWhileSelected(discovered, index)
                 }
             }
         }
     }
 
     fun getTabResponse(api: MontoyaApi, tabId: String): Outcome<String> = runOnEdt {
-        when (val editors = resolveEditors(api, tabId)) {
-            is Outcome.Err -> editors
+        when (val resolved = resolveTab(api, tabId)) {
+            is Outcome.Err -> resolved
             is Outcome.Ok -> {
-                val e = editors.value
-                when {
-                    e.responseAmbiguous -> Outcome.Err(DiscoveryError.AmbiguousResponseEditor())
-                    !isResponseAvailable(e.response?.text) -> Outcome.Err(DiscoveryError.ResponseEditorMissing())
-                    else -> Outcome.Ok(e.response!!.text)
+                val (discovered, index) = resolved.value
+                RepeaterTabSession.withTab(discovered, index) {
+                    readResponseWhileSelected(discovered, index)
                 }
             }
         }
     }
 
     fun setTabRequest(api: MontoyaApi, tabId: String, request: String): Outcome<String> = runOnEdt {
-        when (val editors = resolveEditors(api, tabId)) {
-            is Outcome.Err -> editors
+        when (val resolved = resolveTab(api, tabId)) {
+            is Outcome.Err -> resolved
             is Outcome.Ok -> {
-                val e = editors.value
-                when {
-                    e.requestAmbiguous -> Outcome.Err(DiscoveryError.AmbiguousRequestEditor())
-                    e.request == null -> Outcome.Err(DiscoveryError.RequestEditorMissing())
-                    !e.request.isEditable -> Outcome.Err(DiscoveryError.NotEditable())
-                    else -> {
-                        e.request.text = request
-                        Outcome.Ok("Repeater request has been set for $tabId")
-                    }
+                val (discovered, index) = resolved.value
+                RepeaterTabSession.withTab(discovered, index) {
+                    writeRequestWhileSelected(discovered, index, tabId, request)
                 }
             }
         }
@@ -183,8 +180,9 @@ internal object RepeaterUiDiscovery {
             is Outcome.Err -> resolved
             is Outcome.Ok -> {
                 val (discovered, index) = resolved.value
-                discovered.suiteTabbedPane.selectedIndex = discovered.suiteRepeaterIndex
-                discovered.tabStrip.selectedIndex = index
+                // Intentional leave-on-tab: no restore.
+                RepeaterTabSession.select(discovered, index)
+                RepeaterTabSession.settleEditors(discovered, index)
                 Outcome.Ok("Selected Repeater tab $tabId")
             }
         }
@@ -241,19 +239,27 @@ internal object RepeaterUiDiscovery {
     fun findEditors(tabContent: Component?): TabEditors = findEditorsInRoot(tabContent)
 
     /**
-     * Burp often uses one shared request/response editor pair for all Repeater tabs.
-     * Select the tab first, then search tab content and the wider Repeater panel.
+     * Locate editors for [index] using select → settle → restore.
+     * Prefer [findEditorsWhileSelected] when already inside [RepeaterTabSession.withTab].
      */
     fun findEditorsForTab(discovered: DiscoveredRepeater, index: Int): TabEditors =
-        withTabSelected(discovered, index) {
-            val tabContent = tabContentAt(discovered.tabStrip, index)
-            val inTab = findEditorsInRoot(tabContent)
-            if (inTab.request != null || inTab.response != null) {
-                inTab
-            } else {
-                findEditorsInRoot(discovered.repeaterRoot)
-            }
+        RepeaterTabSession.withTab(discovered, index) {
+            findEditorsWhileSelected(discovered, index)
         }
+
+    /**
+     * Locate editors assuming [index] is already selected (no select/restore).
+     * Burp often uses one shared request/response editor pair for all Repeater tabs.
+     */
+    fun findEditorsWhileSelected(discovered: DiscoveredRepeater, index: Int): TabEditors {
+        val tabContent = tabContentAt(discovered.tabStrip, index)
+        val inTab = findEditorsInRoot(tabContent)
+        return if (inTab.request != null || inTab.response != null) {
+            inTab
+        } else {
+            findEditorsInRoot(discovered.repeaterRoot)
+        }
+    }
 
     fun findEditorsInRoot(root: Component?): TabEditors {
         if (root == null) {
@@ -332,39 +338,69 @@ internal object RepeaterUiDiscovery {
 
     fun buildTabInfo(discovered: DiscoveredRepeater, index: Int): RepeaterTabInfo {
         val strip = discovered.tabStrip
-        val editors = findEditorsForTab(discovered, index)
-        val responseText = editors.response?.text
-        return RepeaterTabInfo(
-            id = RepeaterTabId.fromIndex(index),
-            name = tabTitle(strip, index),
-            index = index,
-            selected = strip.selectedIndex == index,
-            hasRequest = editors.request != null && !editors.requestAmbiguous,
-            hasResponse = !editors.responseAmbiguous && isResponseAvailable(responseText),
-        )
+        val wasSelected = strip.selectedIndex == index
+        return RepeaterTabSession.withTab(discovered, index) {
+            val editors = findEditorsWhileSelected(discovered, index)
+            val responseText = editors.response?.text
+            RepeaterTabInfo(
+                id = RepeaterTabId.fromIndex(index),
+                name = tabTitle(strip, index),
+                index = index,
+                selected = wasSelected,
+                hasRequest = editors.request != null && !editors.requestAmbiguous,
+                hasResponse = !editors.responseAmbiguous && isResponseAvailable(responseText),
+            )
+        }
+    }
+
+    private fun readRequestWhileSelected(discovered: DiscoveredRepeater, index: Int): Outcome<String> {
+        val editors = findEditorsWhileSelected(discovered, index)
+        return when {
+            editors.requestAmbiguous -> Outcome.Err(DiscoveryError.AmbiguousRequestEditor())
+            editors.request == null -> Outcome.Err(DiscoveryError.RequestEditorMissing())
+            else -> Outcome.Ok(editors.request.text)
+        }
+    }
+
+    private fun readResponseWhileSelected(discovered: DiscoveredRepeater, index: Int): Outcome<String> {
+        val editors = findEditorsWhileSelected(discovered, index)
+        return when {
+            editors.responseAmbiguous -> Outcome.Err(DiscoveryError.AmbiguousResponseEditor())
+            !isResponseAvailable(editors.response?.text) -> Outcome.Err(DiscoveryError.ResponseEditorMissing())
+            else -> Outcome.Ok(editors.response!!.text)
+        }
+    }
+
+    private fun writeRequestWhileSelected(
+        discovered: DiscoveredRepeater,
+        index: Int,
+        tabId: String,
+        request: String,
+    ): Outcome<String> {
+        val editors = findEditorsWhileSelected(discovered, index)
+        val target = editors.request
+        return when {
+            editors.requestAmbiguous -> Outcome.Err(DiscoveryError.AmbiguousRequestEditor())
+            target == null -> Outcome.Err(DiscoveryError.RequestEditorMissing())
+            !target.isEditable -> Outcome.Err(DiscoveryError.NotEditable())
+            else -> {
+                target.text = request
+                // Brief settle so document listeners / Burp sync can apply.
+                RepeaterTabSession.settleEditors(discovered, index)
+                val after = findEditorsWhileSelected(discovered, index).request?.text
+                if (after != request) {
+                    Outcome.Err(DiscoveryError.EditorDidNotUpdate())
+                } else {
+                    Outcome.Ok("Repeater request has been set for $tabId")
+                }
+            }
+        }
     }
 
     private fun isChromeTab(strip: JTabbedPane, index: Int): Boolean {
         val title = strip.getTitleAt(index)?.trim() ?: return true
         if (title == "+" || title.equals("new tab", ignoreCase = true)) return true
         return tabContentAt(strip, index) == null && title.isEmpty()
-    }
-
-    private fun <T> withTabSelected(discovered: DiscoveredRepeater, index: Int, block: () -> T): T {
-        val strip = discovered.tabStrip
-        val suite = discovered.suiteTabbedPane
-        val prevStrip = strip.selectedIndex
-        val prevSuite = suite.selectedIndex
-        suite.selectedIndex = discovered.suiteRepeaterIndex
-        strip.selectedIndex = index
-        return try {
-            block()
-        } finally {
-            strip.selectedIndex = prevStrip
-            if (prevSuite >= 0) {
-                suite.selectedIndex = prevSuite
-            }
-        }
     }
 
     /** Burp tab strips may return null for chrome slots (e.g. the "+" tab). */
@@ -378,7 +414,7 @@ internal object RepeaterUiDiscovery {
             is Outcome.Err -> discovered
             is Outcome.Ok -> {
                 val strip = discovered.value.tabStrip
-                if (index >= strip.tabCount) {
+                if (index >= strip.tabCount || isChromeTab(strip, index)) {
                     Outcome.Err(DiscoveryError.TabNotFound(tabId))
                 } else {
                     Outcome.Ok(discovered.value to index)
@@ -386,15 +422,6 @@ internal object RepeaterUiDiscovery {
             }
         }
     }
-
-    private fun resolveEditors(api: MontoyaApi, tabId: String): Outcome<TabEditors> =
-        when (val resolved = resolveTab(api, tabId)) {
-            is Outcome.Err -> resolved
-            is Outcome.Ok -> {
-                val (discovered, index) = resolved.value
-                Outcome.Ok(findEditorsForTab(discovered, index))
-            }
-        }
 
     private fun isRepeaterSuiteTabSelected(discovered: DiscoveredRepeater): Boolean =
         discovered.suiteTabbedPane.selectedIndex == discovered.suiteRepeaterIndex

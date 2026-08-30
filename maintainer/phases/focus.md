@@ -6,7 +6,7 @@
 
 ## Now
 
-1. **Repeater enforce** — every tab-targeted get/set: select Repeater tab → settle editor → act → **restore** prior UI; fast EDT block; clear agent-facing errors (see [`repeater-ui.md`](repeater-ui.md)).
+1. ~~**Repeater enforce**~~ — select → settle → act → **restore** for tab-targeted get/set (`RepeaterTabSession`).
 2. **Repeater Send** — `send_repeater_tab` + send-and-wait response (Swing, fail-safe).
 
 ## Queued (good next chat after rename)
