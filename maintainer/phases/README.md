@@ -24,6 +24,7 @@ Scratch / spikes: **`maintainer/temp/`** (gitignored).
 | [`agent-guides.md`](./agent-guides.md) | **Planned** — Cursor, Claude, terminal MCP setup docs |
 | [`montoya-gaps.md`](./montoya-gaps.md) | **Backlog** — API-first new tools |
 | [`refactor.md`](./refactor.md) | **Ongoing** — layout + `ui/` + split tools (waves) |
+| [`vitepress.md`](./vitepress.md) | **Planned (publish)** — `apps/docs` VitePress + CF Pages (pattern: gform) |
 
 ---
 

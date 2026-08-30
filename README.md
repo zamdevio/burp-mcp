@@ -32,6 +32,7 @@ Connect Burp Suite to MCP clients (SSE or stdio). Agents can send HTTP, read pro
 | **Repository** | [github.com/zamdevio/burp-mcp](https://github.com/zamdevio/burp-mcp) | Source, issues, releases |
 | **Install & usage** | this README | Build JAR, load in Burp, connect clients |
 | **Tool reference** | [`docs/tools.md`](docs/tools.md) | MCP tool catalog |
+| **Repeater** | [`docs/repeater.md`](docs/repeater.md) | Tabs, Send, Target gate |
 | **Agent setup** | [`docs/guides/`](docs/guides/) | Cursor, Claude Desktop, terminal clients *(planned)* |
 | **Architecture** | [`docs/architecture.md`](docs/architecture.md) | Montoya vs Swing, transport |
 | **Limitations** | [`docs/limitations.md`](docs/limitations.md) | Edition and UI constraints |
@@ -52,7 +53,7 @@ We forked that codebase as the baseline, then extended and reorganized it for ag
 | Layer | What changed |
 |-------|----------------|
 | **Upstream baseline** | In-Burp MCP server (Ktor SSE), stdio proxy packaging, Claude Desktop installer, Montoya-backed HTTP / proxy / Intruder / Collaborator / config tools |
-| **Repeater depth** | Live Swing discovery — list, read, write, select, and rename individual Repeater tabs (`repeater-tab-N`) |
+| **Repeater depth** | Live Swing discovery — list, read, write, select, rename, and **Send** individual tabs (`repeater-tab-N`); blocks Send when Target is not specified |
 | **Maintainer layout** | `maintainer/` phases & systems, `.cursor/rules/`, `docs/` for shared planning and reference |
 | **Distribution** | Published as **[zamdevio/burp-mcp](https://github.com/zamdevio/burp-mcp)**; build artifact **`burp-mcp-all.jar`** |
 
@@ -77,7 +78,7 @@ Burp already has a powerful UI. Agents need a **stable MCP surface** into Montoy
 | Area | What agents can do | Notes | Edition |
 |------|-------------------|-------|---------|
 | **HTTP** | Send HTTP/1.1 and HTTP/2; receive full responses | Subject to “require approval” and auto-approved targets | All |
-| **Repeater** | Create tabs; list tabs; read/write request & response; select tab; rename | Uses live Burp UI; tab ids are index-based — re-list after changes | All |
+| **Repeater** | Create tabs; list; read/write; select; rename; **Send** / send-and-wait | Live UI; index ids — re-list after changes; Target must be set before Send | All |
 | **Intruder** | Send a prepared request into Intruder | Create-only today; no Intruder tab enumeration yet | All |
 | **Proxy** | Read HTTP & WebSocket history (incl. regex filters); toggle intercept | History may require data-access approval | All |
 | **Organizer** | List organizer items (incl. regex) | Same approval model as history when enabled | All |
@@ -88,7 +89,7 @@ Burp already has a powerful UI. Agents need a **stable MCP surface** into Montoy
 | **Collaborator** | Generate payloads; poll interactions | — | **Pro** |
 | **Utilities** | URL / Base64 encode-decode; random strings | Stateless helpers | All |
 
-Tool names and parameters: **[`docs/tools.md`](docs/tools.md)** (split per-domain pages under `docs/tools/` planned). Constraints: **[`docs/limitations.md`](docs/limitations.md)**. In-Burp tool catalog in the MCP tab: [`maintainer/phases/mcp-tab-ui.md`](maintainer/phases/mcp-tab-ui.md).
+Tool names and parameters: **[`docs/tools.md`](docs/tools.md)**. Repeater workflows: **[`docs/repeater.md`](docs/repeater.md)**. Constraints: **[`docs/limitations.md`](docs/limitations.md)**. In-Burp tool catalog in the MCP tab: [`maintainer/phases/mcp-tab-ui.md`](maintainer/phases/mcp-tab-ui.md).
 
 ---
 
@@ -155,6 +156,7 @@ Use **Install to Claude Desktop** in the MCP tab, or run the packaged proxy. Ups
 |------|-----|
 | Install & load | [docs/install.md](docs/install.md) |
 | MCP tools | [docs/tools.md](docs/tools.md) |
+| Repeater | [docs/repeater.md](docs/repeater.md) |
 | Agent clients (Cursor, Claude, …) | [docs/guides/](docs/guides/) |
 | How it is built | [docs/architecture.md](docs/architecture.md) |
 | What can go wrong | [docs/limitations.md](docs/limitations.md) |

@@ -6,6 +6,7 @@ User-facing reference for **burp-mcp** (Burp Suite MCP extension). Sprint status
 |-----|----------|
 | [`install.md`](install.md) | Build, load in Burp, connect MCP clients |
 | [`tools.md`](tools.md) | MCP tool catalog (HTTP, Repeater, proxy, Pro tools, …) |
+| [`repeater.md`](repeater.md) | Repeater deep dive — tabs, Send, Target gate |
 | [`architecture.md`](architecture.md) | Montoya vs Swing, transport, package map |
 | [`limitations.md`](limitations.md) | Edition, UI discovery, and agent caveats |
 | [`origins.md`](origins.md) | Relationship to PortSwigger/mcp-server |

@@ -17,6 +17,7 @@ Do not push to upstream. Do not force-push `main` (except a user-requested histo
 ## When to commit
 
 Only when the user asks. Never commit secrets, Burp project files, or `maintainer/temp/` scratch (except `.gitkeep`).
+Never commit personal/hunt-specific hosts, usernames, or machine paths in tracked files — use generic placeholders (`example.com`). `.env` stays gitignored.
 
 ## Message format
 
@@ -46,6 +47,7 @@ chore(init): seed burp-mcp from PortSwigger mcp-server
 ## Gates
 
 - Do not claim done without `./gradlew test`.
+- **MCP / Repeater UI changes:** prefer **live-smoke** ([`live-smoke.mdc`](live-smoke.mdc)) **before commit**. Do not commit those until smoke passes unless the user explicitly asks to commit without smoke.
 - Do not `--no-verify` / skip hooks unless the user explicitly asks.
 - Amend only when the user asks **and** the last commit is ours, unpushed, and not on shared `main` after others pulled.
 

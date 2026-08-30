@@ -31,3 +31,4 @@
 
 - Unit-test pure logic without Burp.
 - Do not commit secrets or live session tokens from manual probes.
+- **No personal / hunt-specific data in tracked files** — tests, docs, examples, and comments use generic hosts (`example.com`, `api.example.com`), not real customer/project domains, usernames, or machine paths. Live smoke may hit real targets; keep that out of the repo.

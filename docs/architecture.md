@@ -24,7 +24,7 @@ MCP client  ──SSE──►  Ktor server (in Burp)  ──►  tool handlers
 | Path | When | Examples |
 |------|------|----------|
 | **Montoya API** | Public API exposes the capability | `send_http1_request`, proxy history, `create_repeater_tab`, Collaborator |
-| **Swing discovery** | API cannot list or read suite UI state | `list_repeater_tabs`, get/set Repeater request text, select/rename tab |
+| **Swing discovery** | API cannot list or read suite UI state | `list_repeater_tabs`, get/set Repeater request text, select/rename, **Send** |
 
 Rules of thumb:
 
@@ -38,7 +38,7 @@ Rules of thumb:
 | Package / area | Role |
 |----------------|------|
 | `tools/` | MCP tool registration and handlers |
-| `repeater/` | Repeater models + Swing discovery |
+| `repeater/` | Repeater models, Swing discovery, tab session, Send |
 | `security/` | Approvals and sensitive-operation gates |
 | `config/` | Burp MCP suite-tab UI and config persistence |
 | `schema/` | Shared serializable DTOs (where used) |

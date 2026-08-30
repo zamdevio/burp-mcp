@@ -23,6 +23,7 @@ alwaysApply: true
 - **No** patching Burp Suite JAR; **no** runtime UI rule downloads from GitHub.
 - Swing: EDT; tab-targeted ops → select → settle → act → **restore** (see repeater-ui phase).
 - Fail safe on ambiguous UI — agent-readable errors, not wrong editor mutations.
+- **No personal / hunt-specific refs in tracked files** — use `example.com` (etc.) in tests/docs; real targets stay in live smoke / gitignored `.env` only.
 
 ## Docs boundary
 - **`maintainer/**`** — contributor/agent only; not mirrored as end-user docs.

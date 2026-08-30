@@ -60,12 +60,14 @@ chore(init): seed burp-mcp from PortSwigger mcp-server
 - `build/`, `.gradle/`, `.kotlin/` (gitignore)
 - Vendored `libs/` (stdio proxy is fetched to `build/proxy/`)
 - `maintainer/temp/*` scratch — keep `.gitkeep` only
+- **Personal / hunt-specific hosts, usernames, or machine paths** in tracked source, tests, or docs (use generic `example.com` placeholders). Live smoke against real apps is fine; do not bake those names into the repo.
 
 ## Gates
 
 1. User asked for the commit.
 2. `./gradlew test` when the change is code (docs-only may skip).
-3. No `--no-verify` unless the user says so.
+3. **Live-smoke** for MCP tool / Repeater Swing changes — see [`live-smoke.md`](live-smoke.md). **Prefer smoke before commit.** Do not commit those changes until smoke passes, unless the user explicitly asks to commit **without** live-smoke.
+4. No `--no-verify` unless the user says so.
 
 ## Origin of this tree
 

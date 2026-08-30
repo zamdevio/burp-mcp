@@ -8,17 +8,25 @@ Twin: `maintainer/agents/live-smoke.md`
 
 ## When
 
-After code that **adds / changes / fixes MCP tools** or Repeater Swing behavior — before claiming done.
+After code that **adds / changes / fixes MCP tools** or Repeater Swing behavior — **before claiming done and before committing** (unless the user explicitly asks to commit without smoke).
+
+**Prefer live-smoke always** for tool/UI work so failures show up here, not later.
 
 ## Flow (same chat)
 
-1. Agent runs `./scripts/deploy-extension.sh` (reads `BURP_EXTENSION_JAR_DEST` from repo `.env`; optional path arg / `--skip-tests`).
-2. Burp **Auto-reload** on the loaded **Burp MCP Server** extension picks up the new JAR — user keeps this enabled in Extensions.
-3. **Ask the user** to reload Cursor Settings → MCP → `burp` (only manual step; agents cannot do this).
-4. After they confirm, smoke **changed** tools via `user-burp`. Report exact errors. Do not invent PASS.
+1. Agent runs `./scripts/deploy-extension.sh` (`.env` dest; optional path / `--skip-tests`).
+2. Burp **Auto-reload** on **Burp MCP Server** (user keeps enabled).
+3. **Ask the user** to reload Cursor Settings → MCP → `burp`.
+4. After they confirm, smoke changed tools via `user-burp` — include **edge / unexpected inputs**. Report exact errors. Do not invent PASS.
+5. Do **not** commit until smoke passes, unless the user overrides.
+
+## Edge cases (do some every smoke)
+
+Bad tab ids, empty strings, huge timeout / tiny timeout, read non-selected tab, write then re-list, Send without waiting vs send-and-wait. Fix clear bugs found; note UI-only ambiguities for the user.
 
 ## Do not
 
 - Skip live smoke for Swing/Repeater UI changes just because unit tests passed.
+- Commit tool/UI changes before smoke unless the user says commit without it.
 - Patch Burp JAR or add a Repeater registry while smoking.
-- Assume Cursor auto-refreshed the MCP tool list after Burp reloads — always wait for the user reload gate.
+- Assume Cursor auto-refreshed MCP after Burp reload.
