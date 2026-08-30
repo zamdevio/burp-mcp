@@ -17,11 +17,14 @@ import kotlin.experimental.ExperimentalTypeInference
 @OptIn(InternalSerializationApi::class)
 inline fun <reified I : Any> Server.mcpTool(
     description: String,
+    tags: Set<ToolTag> = emptySet(),
     crossinline execute: I.() -> List<ContentBlock>
 ) {
     val toolName = I::class.simpleName?.toLowerSnakeCase() ?: error("Couldn't find name for ${I::class}")
     val serializer = I::class.serializer()
     val inputSchema = I::class.asInputSchema()
+    val resolvedTags = tags.ifEmpty { ToolCatalog.inferTags(toolName) }
+    ToolCatalog.record(toolName, description, resolvedTags)
 
     val handler: suspend (ClientConnection, CallToolRequest) -> CallToolResult = { _, request ->
         try {
@@ -50,18 +53,20 @@ inline fun <reified I : Any> Server.mcpTool(
 @JvmName("mcpToolString")
 inline fun <reified I : Any> Server.mcpTool(
     description: String,
+    tags: Set<ToolTag> = emptySet(),
     crossinline execute: I.() -> String
 ) {
-    mcpTool<I>(description, execute = {
+    mcpTool<I>(description, tags, execute = {
         listOf(TextContent(execute(this)))
     })
 }
 
 inline fun <reified I : Any> Server.mcpUnitTool(
     description: String,
+    tags: Set<ToolTag> = emptySet(),
     crossinline execute: I.() -> Unit
 ) {
-    mcpTool<I>(description, execute = {
+    mcpTool<I>(description, tags, execute = {
         execute(this)
 
         listOf(TextContent("Executed tool"))
@@ -70,10 +75,11 @@ inline fun <reified I : Any> Server.mcpUnitTool(
 
 inline fun <reified I : Paginated, J : Any> Server.mcpPaginatedTool(
     description: String,
+    tags: Set<ToolTag> = emptySet(),
     noinline mapper: (J) -> CharSequence = { it.toString() },
     crossinline execute: I.() -> List<J>
 ) {
-    mcpTool<I>(description, execute = {
+    mcpTool<I>(description, tags, execute = {
 
         val items = execute(this)
 
@@ -94,9 +100,10 @@ inline fun <reified I : Paginated, J : Any> Server.mcpPaginatedTool(
 
 inline fun <reified I : Paginated> Server.mcpPaginatedTool(
     description: String,
+    tags: Set<ToolTag> = emptySet(),
     crossinline execute: I.() -> Sequence<String>
 ) {
-    mcpTool<I>(description, execute = {
+    mcpTool<I>(description, tags, execute = {
         val seq = execute(this)
         val paginated = seq.drop(offset).take(count).toList()
 
@@ -110,12 +117,15 @@ inline fun <reified I : Paginated> Server.mcpPaginatedTool(
 
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-@JvmName("mcpNamedToolString")
+@JvmName("mcpNamedToolBlocks")
 inline fun Server.mcpTool(
     name: String,
     description: String,
+    tags: Set<ToolTag> = emptySet(),
     crossinline execute: () -> List<ContentBlock>
 ) {
+    val resolvedTags = tags.ifEmpty { ToolCatalog.inferTags(name) }
+    ToolCatalog.record(name, description, resolvedTags)
     val handler: suspend (ClientConnection, CallToolRequest) -> CallToolResult = { _, _ ->
         CallToolResult(content = execute(), isError = false)
     }
@@ -125,8 +135,11 @@ inline fun Server.mcpTool(
 inline fun Server.mcpTool(
     name: String,
     description: String,
+    tags: Set<ToolTag> = emptySet(),
     crossinline execute: () -> String
 ) {
+    val resolvedTags = tags.ifEmpty { ToolCatalog.inferTags(name) }
+    ToolCatalog.record(name, description, resolvedTags)
     val handler: suspend (ClientConnection, CallToolRequest) -> CallToolResult = { _, _ ->
         CallToolResult(content = listOf(TextContent(execute())), isError = false)
     }

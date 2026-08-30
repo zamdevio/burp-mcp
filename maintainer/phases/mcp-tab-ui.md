@@ -1,68 +1,63 @@
 # Phase: MCP suite tab UI
 
-**Status:** Planned — after Repeater enforce + Send land, or in parallel if UI-only.
+**Status:** **v1 shipped** (Tools catalog). UI polish later. v2/v3 planned — do not build yet.
 
-**Code today:** `config/ConfigUi.kt` — left column hero (“Burp MCP Server” + MCP link), right scroll column: server toggles → auto-approve → advanced host/port → install/extract proxy.
+**Code today:** `config/ConfigUi.kt` — left hero; right **Server | Tools** tabs. Server: toggles → auto-approve → advanced → install. Tools: [`ToolsPanel`](../../src/main/kotlin/net/portswigger/mcp/config/components/ToolsPanel.kt) + [`ToolCatalog`](../../src/main/kotlin/net/portswigger/mcp/tools/ToolCatalog.kt).
 
 ---
 
 ## Problem
 
-Operators and agents discover capabilities from GitHub/docs or by `list_tools` in the client. The Burp **MCP** tab only shows server/security/install — not **what** the extension exposes or **how** tools behave (Pro gates, approval, Repeater vs editor).
+Operators and agents discover capabilities from GitHub/docs or by `list_tools` in the client. The Burp **MCP** tab historically only showed server/security/install — not **what** the extension exposes.
 
 ---
 
-## Goals
+## Waves
 
-1. **In-tab capability catalog** — readable list of registered MCP tools grouped by area (HTTP, Repeater, Proxy, …).
-2. **Descriptions aligned with MCP** — same strings (or shared metadata) used at registration time so docs, UI, and `list_tools` never drift.
-3. **Capability notes** — short badges: `Pro`, `Approval`, `Config edit`, `Swing UI`, `Mutating`.
-4. **Connection hint** — prominent `http://127.0.0.1:{port}` + link to [`docs/guides/`](../docs/guides/) for client setup.
-5. **No installer bloat** — version/strategy reminder only if needed; **no** runtime download of UI rules from GitHub.
+### v1 — Capability catalog (this sprint)
 
----
+1. **In-tab capability catalog** — searchable list grouped by area (HTTP, Repeater, Proxy, …).
+2. **Descriptions aligned with MCP** — `ToolCatalog.record` from `mcpTool` registration; built-in seed for UI before server start.
+3. **Capability notes** — badges: `Pro`, `Approval`, `Config edit`, `Swing UI`, `Mutating`.
+4. **Connection hint** — SSE URL from config host/port + link to docs/guides on GitHub.
+5. **Edition** — hide Pro-tagged tools on Community.
+6. **No installer bloat** — no runtime download of UI rules.
 
-## UX direction (proposal)
+### v2 — Per-tool enable (later — do not build yet)
 
-Keep the existing two-column layout; evolve **left column** from static hero to **tabbed or stacked**:
+- Persist allowlist/denylist in `McpConfig`.
+- Gate `addTool` / call path **server-side** (not UI-only).
+- UI toggles per row; default **all on**.
+- Never bypass global HTTP / history / config-edit gates.
+- Safe deny messages for agents when a tool is disabled.
 
-| Pane | Content |
-|------|---------|
-| **Settings** *(current right column)* | Unchanged flow: enable, permissions, auto-approve, advanced, install |
-| **Tools & capabilities** *(new)* | Search/filter list; expand row → description + notes; copy tool name |
+### v3 — Docs in Burp (later — do not build yet)
 
-Alternative if space is tight: **sub-tabs** at top of right column — `Server` | `Tools` | `Install`.
-
-Use existing `Design.kt` tokens; EDT-only updates; no blocking on tool enumeration.
-
----
-
-## Implementation sketch
-
-1. **Tool metadata registry** — extract name + description + tags from registration (`tools/McpTool.kt` / domain modules) into a read-only `ToolCatalog` consumed by Ktor **and** Swing.
-2. **`ToolsPanel.kt`** (new under `config/components/`) — `JTable` or card list; optional search field.
-3. **Pro / edition** — hide or gray Pro-only rows on Community (mirror runtime tool registration).
-4. **Tests** — lightweight test that catalog size matches registered tool count (no full Swing UI test required initially).
+- Detail pane renders markdown for the selected tool (bundled short pages from `docs/` or embedded snippets).
+- Start small (tool blurbs), not a full VitePress shell inside Swing.
+- Keep deep links to GitHub / future VitePress site for long guides.
 
 ---
 
-## Out of scope (this phase)
+## UX (v1)
 
-- Editing tool enablement per tool (global gates stay in MCP tab checkboxes).
-- Embedding full markdown docs — link out to `docs/tools.md` / future `docs/tools/*.md`.
-- Replacing PortSwigger branding in suite tab title (optional rename to “burp-mcp” is product decision).
+| Tab | Content |
+|-----|---------|
+| **Server** | Existing: enable, permissions, auto-approve, advanced, install |
+| **Tools** | Search + list; description + badges; copy tool name; guides link |
 
 ---
 
-## Done when
+## Done when (v1)
 
-- [ ] User can scroll/search all exposed tools and read descriptions without leaving Burp.
-- [ ] Catalog source is single shared metadata (not duplicated strings in Swing).
-- [ ] README/docs point to this as shipped; receipt in `shipped/`.
+- [x] User can scroll/search exposed tools and read descriptions in Burp.
+- [x] Catalog recorded at registration + built-in seed for offline UI.
+- [x] README/docs point to Tools tab as shipped; receipt in `shipped/` (with this sprint).
 
 ---
 
 ## Related
 
-- [`agent-guides.md`](agent-guides.md) — client setup docs linked from install panel.
-- [`refactor.md`](refactor.md) — split `Tools.kt` makes catalog extraction easier.
+- [`agent-guides.md`](agent-guides.md) — client setup docs linked from Tools pane.
+- [`refactor.md`](refactor.md) — split `Tools.kt` still helpful; not required for v1 seed.
+- [`vitepress.md`](vitepress.md) — public site; v3 may deep-link there later.

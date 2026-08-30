@@ -131,6 +131,13 @@ class InstallationPanel(
                     url = "https://github.com/PortSwigger/mcp-server?tab=readme-ov-file#manual-installations"
                 )
             )
+            add(javax.swing.Box.createHorizontalStrut(Design.Spacing.MD))
+            add(
+                Anchor(
+                    text = "Client setup guides",
+                    url = "https://github.com/zamdevio/burp-mcp/tree/main/docs/guides"
+                )
+            )
         }
     }
 

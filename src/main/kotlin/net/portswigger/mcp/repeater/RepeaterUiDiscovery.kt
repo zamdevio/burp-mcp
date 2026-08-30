@@ -59,13 +59,6 @@ internal object RepeaterUiDiscovery {
                 "<Repeater Send button not found; candidates: $hint>"
             }
         )
-        class AmbiguousSendButton(hint: String? = null) : DiscoveryError(
-            if (hint.isNullOrBlank()) {
-                "<Unable to uniquely identify Repeater Send button>"
-            } else {
-                "<Unable to uniquely identify Repeater Send button; candidates: $hint>"
-            }
-        )
         class SendButtonDisabled : DiscoveryError("<Repeater Send button is disabled>")
         class TargetMissing : DiscoveryError(
             "<Repeater target is not specified; set Target in the Repeater toolbar " +

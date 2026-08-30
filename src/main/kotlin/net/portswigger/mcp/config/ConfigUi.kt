@@ -15,7 +15,11 @@ import javax.swing.*
 import javax.swing.Box.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 
-class ConfigUi(private val config: McpConfig, private val providers: List<Provider>) {
+class ConfigUi(
+    private val config: McpConfig,
+    private val providers: List<Provider>,
+    private val professionalEdition: Boolean = true,
+) {
 
     private val panel = JPanel(BorderLayout())
     val component: JComponent get() = panel
@@ -49,6 +53,7 @@ class ConfigUi(private val config: McpConfig, private val providers: List<Provid
     private lateinit var advancedOptionsPanel: AdvancedOptionsPanel
     private lateinit var autoApproveTargetsPanel: AutoApproveTargetsPanel
     private lateinit var installationPanel: InstallationPanel
+    private lateinit var toolsPanel: ToolsPanel
 
     private var toggleListener: ((Boolean) -> Unit)? = null
     private var suppressToggleEvents: Boolean = false
@@ -83,6 +88,8 @@ class ConfigUi(private val config: McpConfig, private val providers: List<Provid
             config = config, providers = providers, reinstallNotice = reinstallNotice, parentComponent = panel
         )
 
+        toolsPanel = ToolsPanel(config = config, professionalEdition = professionalEdition)
+
         setupConfigListeners()
     }
 
@@ -107,6 +114,9 @@ class ConfigUi(private val config: McpConfig, private val providers: List<Provid
     fun getConfig(): McpConfig {
         config.host = hostField.text
         portField.text.toIntOrNull()?.let { config.port = it }
+        if (::toolsPanel.isInitialized) {
+            toolsPanel.updateConnectionHint()
+        }
         return config
     }
 
@@ -127,6 +137,9 @@ class ConfigUi(private val config: McpConfig, private val providers: List<Provid
                 ServerState.Running -> {
                     enabledToggle.isEnabled = true
                     enabledToggle.setState(true, animate = false)
+                    if (::toolsPanel.isInitialized) {
+                        toolsPanel.refreshFromCatalog()
+                    }
                 }
 
                 ServerState.Stopped -> {
@@ -178,15 +191,24 @@ class ConfigUi(private val config: McpConfig, private val providers: List<Provid
 
         leftPanel.add(headerBox)
 
-        val rightPanelContent = JPanel().apply {
+        val serverPanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             background = Design.Colors.surface
             border = BorderFactory.createEmptyBorder(
                 Design.Spacing.LG, Design.Spacing.LG, Design.Spacing.LG, Design.Spacing.LG
             )
+            add(serverConfigurationPanel)
+            add(createVerticalStrut(Design.Spacing.LG))
+            add(autoApproveTargetsPanel)
+            add(createVerticalStrut(15))
+            add(advancedOptionsPanel)
+            add(createVerticalGlue())
+            add(reinstallNotice)
+            add(createVerticalStrut(10))
+            add(installationPanel)
         }
 
-        val rightPanel = JScrollPane(rightPanelContent).apply {
+        val serverScroll = JScrollPane(serverPanel).apply {
             border = null
             background = Design.Colors.surface
             viewport.background = Design.Colors.surface
@@ -195,20 +217,12 @@ class ConfigUi(private val config: McpConfig, private val providers: List<Provid
             verticalScrollBar.unitIncrement = 16
         }
 
-        rightPanelContent.add(serverConfigurationPanel)
-        rightPanelContent.add(createVerticalStrut(Design.Spacing.LG))
+        val rightTabs = JTabbedPane().apply {
+            addTab("Server", serverScroll)
+            addTab("Tools", toolsPanel)
+        }
 
-        rightPanelContent.add(autoApproveTargetsPanel)
-
-        rightPanelContent.add(createVerticalStrut(15))
-        rightPanelContent.add(advancedOptionsPanel)
-        rightPanelContent.add(createVerticalGlue())
-        rightPanelContent.add(reinstallNotice)
-        rightPanelContent.add(createVerticalStrut(10))
-
-        rightPanelContent.add(installationPanel)
-
-        val columnsPanel = ResponsiveColumnsPanel(leftPanel, rightPanel)
+        val columnsPanel = ResponsiveColumnsPanel(leftPanel, rightTabs)
         panel.add(columnsPanel, BorderLayout.CENTER)
     }
 }

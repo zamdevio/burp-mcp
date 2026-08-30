@@ -2,6 +2,7 @@ package net.portswigger.mcp
 
 import burp.api.montoya.BurpExtension
 import burp.api.montoya.MontoyaApi
+import burp.api.montoya.core.BurpSuiteEdition
 import net.portswigger.mcp.config.ConfigUi
 import net.portswigger.mcp.config.McpConfig
 import net.portswigger.mcp.providers.ClaudeDesktopProvider
@@ -18,12 +19,15 @@ class ExtensionBase : BurpExtension {
         val serverManager = KtorServerManager(api)
 
         val proxyJarManager = ProxyJarManager(api.logging())
+        val professional = api.burpSuite().version().edition() == BurpSuiteEdition.PROFESSIONAL
 
         val configUi = ConfigUi(
-            config = config, providers = listOf(
+            config = config,
+            providers = listOf(
                 ClaudeDesktopProvider(api.logging(), proxyJarManager),
                 ManualProxyInstallerProvider(api.logging(), proxyJarManager),
-            )
+            ),
+            professionalEdition = professional,
         )
 
         configUi.onEnabledToggled { enabled ->

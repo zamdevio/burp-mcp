@@ -20,8 +20,8 @@ Scratch / spikes: **`maintainer/temp/`** (gitignored).
 | Doc | Status |
 |-----|--------|
 | [`repeater-ui.md`](./repeater-ui.md) | **Active** — enforce select/settle/restore, Send, agent errors |
-| [`mcp-tab-ui.md`](./mcp-tab-ui.md) | **Planned** — tool catalog + capability notes in Burp MCP tab |
-| [`agent-guides.md`](./agent-guides.md) | **Planned** — Cursor, Claude, terminal MCP setup docs |
+| [`mcp-tab-ui.md`](./mcp-tab-ui.md) | **Active** — v1 Tools catalog; v2/v3 planned |
+| [`agent-guides.md`](./agent-guides.md) | **Shipped (docs)** — Cursor, Claude, generic SSE/stdio |
 | [`montoya-gaps.md`](./montoya-gaps.md) | **Backlog** — API-first new tools |
 | [`refactor.md`](./refactor.md) | **Ongoing** — layout + `ui/` + split tools (waves) |
 | [`vitepress.md`](./vitepress.md) | **Planned (publish)** — `apps/docs` VitePress + CF Pages (pattern: gform) |

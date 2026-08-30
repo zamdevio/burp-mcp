@@ -2,6 +2,7 @@ package net.portswigger.mcp.config.components
 
 import net.portswigger.mcp.config.Design
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import javax.swing.BorderFactory
@@ -9,7 +10,7 @@ import javax.swing.BoxLayout
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
-class ResponsiveColumnsPanel(private val leftPanel: JPanel, private val rightPanel: JScrollPane) : JPanel() {
+class ResponsiveColumnsPanel(private val leftPanel: JPanel, private val rightPanel: Component) : JPanel() {
     private val minWidthForTwoColumns = 900
     private val minWidthForLargePadding = 700
     private var lastLayout = Layout.SINGLE_COLUMN
@@ -27,7 +28,7 @@ class ResponsiveColumnsPanel(private val leftPanel: JPanel, private val rightPan
     override fun updateUI() {
         super.updateUI()
         if (isInitialized) {
-            updateLayout() // Reapply layout with updated theme colors
+            updateLayout()
         }
     }
 
@@ -51,8 +52,9 @@ class ResponsiveColumnsPanel(private val leftPanel: JPanel, private val rightPan
             PaddingSize.SMALL -> Design.Spacing.SM
         }
 
-        if (rightPanel.viewport.view is JPanel) {
-            val contentPanel = rightPanel.viewport.view as JPanel
+        val scroll = rightPanel as? JScrollPane
+        if (scroll?.viewport?.view is JPanel) {
+            val contentPanel = scroll.viewport.view as JPanel
             contentPanel.border = BorderFactory.createEmptyBorder(padding, padding, padding, padding)
         }
 

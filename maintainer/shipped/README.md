@@ -9,6 +9,9 @@ Receipts for contributors and agents — **check before re-implementing**.
 | 2026-08-30 | Repeater **Send**: `send_repeater_tab` + `send_repeater_tab_and_get_response` (`RepeaterSend`); block when Target is Not specified; dismiss Configure-target dialog |
 | 2026-08-30 | Repeater **enforce**: select → settle → act → restore (`RepeaterTabSession`); act while selected; editor-did-not-update error |
 | 2026-08-30 | Docs: [`docs/repeater.md`](../../docs/repeater.md) user guide |
+| 2026-08-30 | Agent guides v1 under [`docs/guides/`](../../docs/guides/) |
+| 2026-08-30 | `scripts/mcp/check.sh` + `test.sh` (host auto-detect, SSE handshake) |
+| 2026-08-30 | MCP tab **Tools** catalog v1 (`ToolCatalog` + `ToolsPanel`; Server \| Tools tabs) |
 | 2026-08-30 | Live validation: tab list + request/response + Send/target-gate on Burp 2026.x |
 | 2026-08-30 | Maintainer scaffold: phases, systems, agents, `.cursor`, `docs/`, `scripts/` |
 
