@@ -41,6 +41,8 @@ Reload the JAR after rebuilding if you already had an older copy loaded.
 
 ## Connect an MCP client
 
+Client-specific steps: **[`guides/`](guides/)** (Cursor, Claude Desktop, Claude Code, generic SSE/stdio).
+
 ### SSE (many IDE / agent hosts)
 
 Point the client at:
@@ -49,7 +51,12 @@ Point the client at:
 http://127.0.0.1:9876
 ```
 
-Client guides: [`guides/README.md`](guides/README.md).
+From this repo, verify Burp’s side:
+
+```bash
+./scripts/mcp/check.sh
+./scripts/mcp/test.sh
+```
 
 ### Stdio proxy (e.g. Claude Desktop)
 
@@ -60,6 +67,8 @@ Prefer the **Install to Claude Desktop** action in the MCP tab when available. M
 ```
 
 The stdio proxy is fetched at build time into `build/proxy/mcp-proxy-all.jar` and embedded in the extension JAR. Source: [PortSwigger/mcp-proxy](https://github.com/PortSwigger/mcp-proxy) (binary vendored upstream in [PortSwigger/mcp-server](https://github.com/PortSwigger/mcp-server)).
+
+See [`guides/claude-desktop.md`](guides/claude-desktop.md) and [`guides/generic-stdio.md`](guides/generic-stdio.md).
 
 ## After connect
 

@@ -33,7 +33,7 @@ Connect Burp Suite to MCP clients (SSE or stdio). Agents can send HTTP, read pro
 | **Install & usage** | this README | Build JAR, load in Burp, connect clients |
 | **Tool reference** | [`docs/tools.md`](docs/tools.md) | MCP tool catalog |
 | **Repeater** | [`docs/repeater.md`](docs/repeater.md) | Tabs, Send, Target gate |
-| **Agent setup** | [`docs/guides/`](docs/guides/) | Cursor, Claude Desktop, terminal clients *(planned)* |
+| **Agent setup** | [`docs/guides/`](docs/guides/) | Cursor, Claude Desktop, Claude Code, SSE/stdio |
 | **Architecture** | [`docs/architecture.md`](docs/architecture.md) | Montoya vs Swing, transport |
 | **Limitations** | [`docs/limitations.md`](docs/limitations.md) | Edition and UI constraints |
 | **Contributing** | [`docs/contributing.md`](docs/contributing.md) · [`maintainer/`](maintainer/) | Contributors and agents |
