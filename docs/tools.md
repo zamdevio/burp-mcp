@@ -130,4 +130,5 @@ Always export before merge so you know the schema. Follow the tool descriptions 
 
 - Handlers: `src/main/kotlin/net/portswigger/mcp/tools/`
 - Patterns: [`maintainer/systems/mcp-tools.md`](../maintainer/systems/mcp-tools.md)
-- Backlog of Montoya APIs not yet exposed: [`maintainer/phases/montoya-gaps.md`](../maintainer/phases/montoya-gaps.md)
+- Per-area done/todo ledgers: [`maintainer/phases/tools/`](../maintainer/phases/tools/)
+- Montoya index: [`maintainer/phases/montoya-gaps.md`](../maintainer/phases/montoya-gaps.md)

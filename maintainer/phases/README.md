@@ -19,10 +19,11 @@ Scratch / spikes: **`maintainer/temp/`** (gitignored).
 
 | Doc | Status |
 |-----|--------|
+| [`tools/`](./tools/README.md) | **Active** — per-area MCP tool ledgers (Repeater, Target, …) |
 | [`repeater-ui.md`](./repeater-ui.md) | **Active** — enforce select/settle/restore, Send, agent errors |
 | [`mcp-tab-ui.md`](./mcp-tab-ui.md) | **Active** — v1 Tools catalog; v2/v3 planned |
 | [`agent-guides.md`](./agent-guides.md) | **Shipped (docs)** — Cursor, Claude, generic SSE/stdio |
-| [`montoya-gaps.md`](./montoya-gaps.md) | **Backlog** — API-first new tools |
+| [`montoya-gaps.md`](./montoya-gaps.md) | **Pointer** — API notes; detail in [`tools/`](./tools/) |
 | [`refactor.md`](./refactor.md) | **Ongoing** — layout + `ui/` + split tools (waves) |
 | [`vitepress.md`](./vitepress.md) | **Planned (publish)** — `apps/docs` VitePress + CF Pages (pattern: gform) |
 
@@ -30,7 +31,7 @@ Scratch / spikes: **`maintainer/temp/`** (gitignored).
 
 ## Lifecycle
 
-1. Scope from **`focus.md`** and one phase doc — one slice per change when possible.
-2. Close slices in **`shipped/`** with date + one line.
+1. Scope from **`focus.md`** and one phase doc — or an area ledger under [`tools/`](./tools/) — one slice per change when possible.
+2. Close slices in **`shipped/`** with date + one line; mark ledger Status `done`.
 3. Session noise → **`maintainer/temp/`** only.
 4. Gates before merge: [`systems/health.md`](../systems/health.md).

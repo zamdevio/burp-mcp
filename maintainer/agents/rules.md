@@ -3,6 +3,7 @@
 ## Source of truth
 
 - Sprint: [`phases/focus.md`](../phases/focus.md)
+- Tool ledgers: [`phases/tools/`](../phases/tools/)
 - Repeater: [`phases/repeater-ui.md`](../phases/repeater-ui.md)
 - Shipped: [`shipped/README.md`](../shipped/README.md) — do not redo closed work
 - Layout: [`tree.md`](tree.md)

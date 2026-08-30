@@ -47,7 +47,8 @@ Load `build/libs/burp-mcp-all.jar` in Burp for UI work.
 | 6 | [`agents/rules.md`](rules.md) |
 | 7 | [`shipped/README.md`](../shipped/README.md) |
 | 8 | [`agents/live-smoke.md`](live-smoke.md) after tool / Repeater UI changes |
-| 9 | [`phases/montoya-gaps.md`](../phases/montoya-gaps.md) when adding API tools |
+| 9 | [`phases/tools/`](../phases/tools/) when adding or planning MCP tools |
+| 10 | [`phases/montoya-gaps.md`](../phases/montoya-gaps.md) short Montoya index (detail in `tools/`) |
 
 ---
 

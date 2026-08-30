@@ -5,8 +5,9 @@ alwaysApply: true
 
 ## Source of truth
 - **Sprint:** `maintainer/phases/focus.md`
+- **Per-area MCP tool ledgers:** `maintainer/phases/tools/` (README + area files)
 - **Repeater / Swing UI:** `maintainer/phases/repeater-ui.md`
-- **Montoya tool backlog:** `maintainer/phases/montoya-gaps.md`
+- **Montoya index:** `maintainer/phases/montoya-gaps.md` (detail lives in `tools/`)
 - **Refactor waves:** `maintainer/phases/refactor.md`
 - **Shipped receipts:** `maintainer/shipped/README.md` (check before re-implementing)
 - **Systems maps:** `maintainer/systems/README.md`
@@ -31,6 +32,7 @@ alwaysApply: true
 - Root **README** — install and quick usage.
 
 ## Adding tools
-- Prefer Montoya API when available (`maintainer/phases/montoya-gaps.md`).
+- Update the area ledger under `maintainer/phases/tools/` first (or add a new area from `_TEMPLATE.md`).
+- Prefer Montoya when available (`maintainer/phases/montoya-gaps.md` + area ledger).
 - Register via `tools/McpTool.kt` patterns; split domains out of monolithic `Tools.kt` per refactor phase.
 - Respect `security/` gates for HTTP, history, config editing.

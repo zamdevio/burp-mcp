@@ -6,14 +6,15 @@
 
 ## Now
 
-1. ~~**Montoya gaps (slice)**~~ — intercept / version / scope check.
-2. ~~**Montoya gaps (slice 2)**~~ — scope include/exclude + `get_project_info`.
+1. **Repeater Notes** — `get_repeater_tab_notes` / `set_repeater_tab_notes` ([`tools/repeater.md`](tools/repeater.md))
+2. Next after that: Target **`list_scope_rules`** spike ([`tools/target.md`](tools/target.md))
 
 ## Queued
 
 | Phase | Doc | Why |
 |-------|-----|-----|
-| Montoya next | [`montoya-gaps.md`](montoya-gaps.md) | Sitemap (paginated), cookies, … |
+| Target scope table CRUD | [`tools/target.md`](tools/target.md) | List/remove/edit after list spike |
+| Sitemap (+ approval) | [`tools/target.md`](tools/target.md) · [`montoya-gaps.md`](montoya-gaps.md) | Paginated site map |
 | MCP tab v2/v3 | [`mcp-tab-ui.md`](mcp-tab-ui.md) | Per-tool enable; markdown docs in Burp |
 | VitePress site | [`vitepress.md`](vitepress.md) | Publish: `apps/docs` + CF Pages (follow gform) |
 | Refactor Wave B | [`refactor.md`](refactor.md) | Split `Tools.kt` when touching many tools |
@@ -35,6 +36,7 @@
 - Agent guides v1; `scripts/mcp` check/test; MCP tab Tools catalog v1
 - Montoya: `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`
 - Montoya: `include_in_scope`, `exclude_from_scope`, `get_project_info`
+- Tool coverage ledgers: [`tools/`](tools/README.md) (`repeater.md`, `target.md`)
 
 ## Not now
 
