@@ -419,6 +419,28 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
         Json.encodeToString(ScopeCheckResult(url = url, inScope = inScope))
     }
 
+    mcpTool<IncludeInScope>(
+        "Includes the given URL in Burp's Suite-wide target scope."
+    ) {
+        api.scope().includeInScope(url)
+        Json.encodeToString(ScopeMutationResult(url = url, action = "include", inScope = api.scope().isInScope(url)))
+    }
+
+    mcpTool<ExcludeFromScope>(
+        "Excludes the given URL from Burp's Suite-wide target scope."
+    ) {
+        api.scope().excludeFromScope(url)
+        Json.encodeToString(ScopeMutationResult(url = url, action = "exclude", inScope = api.scope().isInScope(url)))
+    }
+
+    mcpTool(
+        "get_project_info",
+        "Returns the current Burp project name and id for agent context."
+    ) {
+        val project = api.project()
+        Json.encodeToString(ProjectInfo(name = project.name(), id = project.id()))
+    }
+
     mcpTool("get_active_editor_contents", "Outputs the contents of the user's active message editor") {
         getActiveEditor(api)?.text ?: "<No active editor>"
     }
@@ -659,7 +681,19 @@ data class BurpVersionInfo(
 data class IsInScope(val url: String)
 
 @Serializable
+data class IncludeInScope(val url: String)
+
+@Serializable
+data class ExcludeFromScope(val url: String)
+
+@Serializable
 data class ScopeCheckResult(val url: String, val inScope: Boolean)
+
+@Serializable
+data class ScopeMutationResult(val url: String, val action: String, val inScope: Boolean)
+
+@Serializable
+data class ProjectInfo(val name: String, val id: String)
 
 @Serializable
 data class SetActiveEditorContents(val text: String)

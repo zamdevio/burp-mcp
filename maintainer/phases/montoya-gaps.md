@@ -15,7 +15,7 @@ Legend: **Exposed** · **Gap** · **Skip**
 | Intruder | `send_to_intruder` |
 | Proxy | HTTP/WS history + regex, `set_proxy_intercept_state`, `get_proxy_intercept_state` |
 | Organizer | items + regex |
-| Scope / info | `is_in_scope`, `get_burp_version` |
+| Scope / info | `is_in_scope`, `include_in_scope`, `exclude_from_scope`, `get_burp_version`, `get_project_info` |
 | Scanner | `get_scanner_issues` (Pro) |
 | Collaborator | generate payload, get interactions (Pro) |
 | Config | `output_*` / `set_*` project & user options |
@@ -31,13 +31,13 @@ Legend: **Exposed** · **Gap** · **Skip**
 |-------------|----------------------|--------|
 | ~~`Proxy.isInterceptEnabled()`~~ | ~~`get_proxy_intercept_state`~~ | **Shipped** |
 | ~~`Scope.isInScope(url)`~~ | ~~`is_in_scope`~~ | **Shipped** |
-| `Scope.includeInScope` / `excludeFromScope` | `include_in_scope`, `exclude_from_scope` | Mutating; align with HTTP approval UX |
+| ~~`Scope.includeInScope` / `excludeFromScope`~~ | ~~`include_in_scope`, `exclude_from_scope`~~ | **Shipped** |
 | `SiteMap.requestResponses()` | `get_sitemap_entries` (paginated) | Reuse data-access approval |
 | `SiteMap.add(...)` | `add_to_sitemap` | Niche |
 | `Http.cookieJar()` | cookie helpers | Session testing |
 | `Http.sendRequests` (batch) | batch send | Fewer round-trips |
 | ~~`BurpSuite.version()`~~ | ~~`get_burp_version`~~ | **Shipped** |
-| `Project.name()` / `id()` | `get_project_info` | Agent context |
+| ~~`Project.name()` / `id()`~~ | ~~`get_project_info`~~ | **Shipped** |
 | `Decoder.sendToDecoder` | `send_to_decoder` | |
 | `Comparer.sendToComparer` | `send_to_comparer` | |
 
@@ -77,8 +77,8 @@ Legend: **Exposed** · **Gap** · **Skip**
 1. ~~Finish Repeater enforce + Send~~ ([`repeater-ui.md`](repeater-ui.md))
 2. ~~`get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`~~
 3. Sitemap (paginated + approval)
-4. Scope include/exclude
-5. Cookie jar / `get_project_info`
+4. ~~Scope include/exclude~~ / ~~`get_project_info`~~
+5. Cookie jar
 6. Intruder tab inspection (Swing)
 7. Scanner crawl/audit (careful)
 

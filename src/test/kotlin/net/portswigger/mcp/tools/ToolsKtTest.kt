@@ -663,6 +663,47 @@ class ToolsKtTest {
             verify(exactly = 1) { scope.isInScope("https://example.com/") }
             verify(exactly = 1) { scope.isInScope("https://out.example/") }
         }
+
+        @Test
+        fun `include and exclude from scope should mutate Montoya Scope`() {
+            val scope = mockk<burp.api.montoya.scope.Scope>()
+            every { api.scope() } returns scope
+            every { scope.includeInScope(any()) } just runs
+            every { scope.excludeFromScope(any()) } just runs
+            every { scope.isInScope("https://example.com/path") } returnsMany listOf(true, false)
+
+            runBlocking {
+                val include = client.callTool("include_in_scope", mapOf("url" to "https://example.com/path"))
+                delay(100)
+                val includeText = include.expectTextContent()
+                assertTrue(includeText.contains("\"action\":\"include\"") || includeText.contains("include"))
+                assertTrue(includeText.contains("\"inScope\":true") || includeText.contains("\"inScope\": true"))
+
+                val exclude = client.callTool("exclude_from_scope", mapOf("url" to "https://example.com/path"))
+                delay(100)
+                val excludeText = exclude.expectTextContent()
+                assertTrue(excludeText.contains("\"action\":\"exclude\"") || excludeText.contains("exclude"))
+            }
+
+            verify(exactly = 1) { scope.includeInScope("https://example.com/path") }
+            verify(exactly = 1) { scope.excludeFromScope("https://example.com/path") }
+        }
+
+        @Test
+        fun `get project info should return name and id`() {
+            val project = mockk<burp.api.montoya.project.Project>()
+            every { api.project() } returns project
+            every { project.name() } returns "demo-project"
+            every { project.id() } returns "proj-123"
+
+            runBlocking {
+                val result = client.callTool("get_project_info", emptyMap())
+                delay(100)
+                val text = result.expectTextContent()
+                assertTrue(text.contains("demo-project"))
+                assertTrue(text.contains("proj-123"))
+            }
+        }
         
         @Test
         fun `config editing tools should respect config settings`() {

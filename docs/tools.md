@@ -76,7 +76,10 @@ Repeater deep dive (Target gate, agent loops): [`repeater.md`](repeater.md). Cav
 | Tool | Purpose |
 |------|---------|
 | `is_in_scope` | Whether a URL is in Suite-wide target scope |
+| `include_in_scope` | Add a URL to Suite-wide target scope |
+| `exclude_from_scope` | Remove a URL from Suite-wide target scope |
 | `get_burp_version` | Product name, edition, build number, version string |
+| `get_project_info` | Current project name and id |
 
 ---
 

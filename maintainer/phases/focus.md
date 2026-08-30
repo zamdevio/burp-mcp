@@ -6,13 +6,14 @@
 
 ## Now
 
-1. ~~**Montoya gaps (slice)**~~ — `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`.
+1. ~~**Montoya gaps (slice)**~~ — intercept / version / scope check.
+2. ~~**Montoya gaps (slice 2)**~~ — scope include/exclude + `get_project_info`.
 
 ## Queued
 
 | Phase | Doc | Why |
 |-------|-----|-----|
-| Montoya next | [`montoya-gaps.md`](montoya-gaps.md) | Sitemap, scope mutate, project info, cookies… |
+| Montoya next | [`montoya-gaps.md`](montoya-gaps.md) | Sitemap (paginated), cookies, … |
 | MCP tab v2/v3 | [`mcp-tab-ui.md`](mcp-tab-ui.md) | Per-tool enable; markdown docs in Burp |
 | VitePress site | [`vitepress.md`](vitepress.md) | Publish: `apps/docs` + CF Pages (follow gform) |
 | Refactor Wave B | [`refactor.md`](refactor.md) | Split `Tools.kt` when touching many tools |
@@ -33,6 +34,7 @@
 - User guide [`docs/repeater.md`](../../docs/repeater.md); VitePress phase [`vitepress.md`](vitepress.md)
 - Agent guides v1; `scripts/mcp` check/test; MCP tab Tools catalog v1
 - Montoya: `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`
+- Montoya: `include_in_scope`, `exclude_from_scope`, `get_project_info`
 
 ## Not now
 
