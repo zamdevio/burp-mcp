@@ -1,0 +1,24 @@
+---
+description: Live smoke against Burp MCP after tool-affecting changes
+alwaysApply: true
+---
+# Live smoke (Burp MCP)
+
+Twin: `maintainer/agents/live-smoke.md`
+
+## When
+
+After code that **adds / changes / fixes MCP tools** or Repeater Swing behavior — before claiming done.
+
+## Flow (same chat)
+
+1. Agent runs `./scripts/deploy-extension.sh` (reads `BURP_EXTENSION_JAR_DEST` from repo `.env`; optional path arg / `--skip-tests`).
+2. Burp **Auto-reload** on the loaded **Burp MCP Server** extension picks up the new JAR — user keeps this enabled in Extensions.
+3. **Ask the user** to reload Cursor Settings → MCP → `burp` (only manual step; agents cannot do this).
+4. After they confirm, smoke **changed** tools via `user-burp`. Report exact errors. Do not invent PASS.
+
+## Do not
+
+- Skip live smoke for Swing/Repeater UI changes just because unit tests passed.
+- Patch Burp JAR or add a Repeater registry while smoking.
+- Assume Cursor auto-refreshed the MCP tool list after Burp reloads — always wait for the user reload gate.

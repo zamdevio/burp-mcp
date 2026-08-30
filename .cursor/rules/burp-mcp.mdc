@@ -10,7 +10,7 @@ alwaysApply: true
 - **Refactor waves:** `maintainer/phases/refactor.md`
 - **Shipped receipts:** `maintainer/shipped/README.md` (check before re-implementing)
 - **Systems maps:** `maintainer/systems/README.md`
-- **Agent guides:** `maintainer/agents/README.md` · **Onboarding:** `maintainer/agents/onboarding.md` · **Rules:** `maintainer/agents/rules.md`
+- **Agent guides:** `maintainer/agents/README.md` · **Onboarding:** `maintainer/agents/onboarding.md` · **Rules:** `maintainer/agents/rules.md` · **Live smoke:** `maintainer/agents/live-smoke.md` · `.cursor/rules/live-smoke.mdc`
 - **Tree layout:** `maintainer/agents/tree.md` · `.cursor/rules/tree.mdc`
 - **Git:** `maintainer/agents/git.md` · `.cursor/rules/git.mdc`
 
