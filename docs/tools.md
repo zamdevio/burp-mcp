@@ -67,6 +67,16 @@ Repeater deep dive (Target gate, agent loops): [`repeater.md`](repeater.md). Cav
 | `get_proxy_websocket_history` | WebSocket history |
 | `get_proxy_websocket_history_regex` | WebSocket history filtered by regex |
 | `set_proxy_intercept_state` | Enable or disable Proxy intercept |
+| `get_proxy_intercept_state` | Whether Proxy intercept is currently enabled |
+
+---
+
+## Scope & info
+
+| Tool | Purpose |
+|------|---------|
+| `is_in_scope` | Whether a URL is in Suite-wide target scope |
+| `get_burp_version` | Product name, edition, build number, version string |
 
 ---
 

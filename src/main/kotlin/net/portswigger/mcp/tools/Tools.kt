@@ -389,6 +389,36 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
         "Intercept has been ${if (intercepting) "enabled" else "disabled"}"
     }
 
+    mcpTool(
+        "get_proxy_intercept_state",
+        "Returns whether Burp Proxy intercept is currently enabled (pairs with set_proxy_intercept_state)."
+    ) {
+        val intercepting = api.proxy().isInterceptEnabled
+        Json.encodeToString(ProxyInterceptState(intercepting = intercepting))
+    }
+
+    mcpTool(
+        "get_burp_version",
+        "Returns Burp Suite product name, edition, build number, and version string for agent context."
+    ) {
+        val v = api.burpSuite().version()
+        Json.encodeToString(
+            BurpVersionInfo(
+                name = v.name(),
+                edition = v.edition().name,
+                buildNumber = v.buildNumber(),
+                version = v.toString(),
+            )
+        )
+    }
+
+    mcpTool<IsInScope>(
+        "Returns whether the given URL is within Burp's Suite-wide target scope."
+    ) {
+        val inScope = api.scope().isInScope(url)
+        Json.encodeToString(ScopeCheckResult(url = url, inScope = inScope))
+    }
+
     mcpTool("get_active_editor_contents", "Outputs the contents of the user's active message editor") {
         getActiveEditor(api)?.text ?: "<No active editor>"
     }
@@ -613,6 +643,23 @@ data class SetTaskExecutionEngineState(val running: Boolean)
 
 @Serializable
 data class SetProxyInterceptState(val intercepting: Boolean)
+
+@Serializable
+data class ProxyInterceptState(val intercepting: Boolean)
+
+@Serializable
+data class BurpVersionInfo(
+    val name: String,
+    val edition: String,
+    val buildNumber: Long,
+    val version: String,
+)
+
+@Serializable
+data class IsInScope(val url: String)
+
+@Serializable
+data class ScopeCheckResult(val url: String, val inScope: Boolean)
 
 @Serializable
 data class SetActiveEditorContents(val text: String)

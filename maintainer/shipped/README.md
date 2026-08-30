@@ -12,6 +12,7 @@ Receipts for contributors and agents — **check before re-implementing**.
 | 2026-08-30 | Agent guides v1 under [`docs/guides/`](../../docs/guides/) |
 | 2026-08-30 | `scripts/mcp/check.sh` + `test.sh` (host auto-detect, SSE handshake) |
 | 2026-08-30 | MCP tab **Tools** catalog v1 (`ToolCatalog` + `ToolsPanel`; Server \| Tools tabs) |
+| 2026-08-30 | Montoya: `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope` |
 | 2026-08-30 | Live validation: tab list + request/response + Send/target-gate on Burp 2026.x |
 | 2026-08-30 | Maintainer scaffold: phases, systems, agents, `.cursor`, `docs/`, `scripts/` |
 

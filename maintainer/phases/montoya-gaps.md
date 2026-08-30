@@ -6,15 +6,16 @@ Legend: **Exposed** · **Gap** · **Skip**
 
 ---
 
-## Already exposed (~35 tools)
+## Already exposed
 
 | Area | MCP tools |
 |------|-----------|
 | HTTP | `send_http1_request`, `send_http2_request` |
-| Repeater | `create_repeater_tab`, `create_repeater_tab_http2`, tab list/read/write/select/title (Swing) |
+| Repeater | `create_repeater_tab`, `create_repeater_tab_http2`, tab list/read/write/select/title/Send (Swing) |
 | Intruder | `send_to_intruder` |
-| Proxy | HTTP/WS history + regex, `set_proxy_intercept_state` |
+| Proxy | HTTP/WS history + regex, `set_proxy_intercept_state`, `get_proxy_intercept_state` |
 | Organizer | items + regex |
+| Scope / info | `is_in_scope`, `get_burp_version` |
 | Scanner | `get_scanner_issues` (Pro) |
 | Collaborator | generate payload, get interactions (Pro) |
 | Config | `output_*` / `set_*` project & user options |
@@ -28,14 +29,14 @@ Legend: **Exposed** · **Gap** · **Skip**
 
 | Montoya API | Suggested MCP tool(s) | Notes |
 |-------------|----------------------|--------|
-| `Proxy.isInterceptEnabled()` | `get_proxy_intercept_state` | Pairs with setter |
-| `Scope.isInScope(url)` | `is_in_scope` | Read-only |
+| ~~`Proxy.isInterceptEnabled()`~~ | ~~`get_proxy_intercept_state`~~ | **Shipped** |
+| ~~`Scope.isInScope(url)`~~ | ~~`is_in_scope`~~ | **Shipped** |
 | `Scope.includeInScope` / `excludeFromScope` | `include_in_scope`, `exclude_from_scope` | Mutating; align with HTTP approval UX |
 | `SiteMap.requestResponses()` | `get_sitemap_entries` (paginated) | Reuse data-access approval |
 | `SiteMap.add(...)` | `add_to_sitemap` | Niche |
 | `Http.cookieJar()` | cookie helpers | Session testing |
 | `Http.sendRequests` (batch) | batch send | Fewer round-trips |
-| `BurpSuite.version()` | `get_burp_version` | Agent context |
+| ~~`BurpSuite.version()`~~ | ~~`get_burp_version`~~ | **Shipped** |
 | `Project.name()` / `id()` | `get_project_info` | Agent context |
 | `Decoder.sendToDecoder` | `send_to_decoder` | |
 | `Comparer.sendToComparer` | `send_to_comparer` | |
@@ -73,11 +74,11 @@ Legend: **Exposed** · **Gap** · **Skip**
 
 ## Priority order
 
-1. Finish Repeater enforce + Send ([`repeater-ui.md`](repeater-ui.md))
-2. `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`
+1. ~~Finish Repeater enforce + Send~~ ([`repeater-ui.md`](repeater-ui.md))
+2. ~~`get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`~~
 3. Sitemap (paginated + approval)
 4. Scope include/exclude
-5. Cookie jar
+5. Cookie jar / `get_project_info`
 6. Intruder tab inspection (Swing)
 7. Scanner crawl/audit (careful)
 

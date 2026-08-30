@@ -80,7 +80,8 @@ Burp already has a powerful UI. Agents need a **stable MCP surface** into Montoy
 | **HTTP** | Send HTTP/1.1 and HTTP/2; receive full responses | Subject to “require approval” and auto-approved targets | All |
 | **Repeater** | Create tabs; list; read/write; select; rename; **Send** / send-and-wait | Live UI; index ids — re-list after changes; Target must be set before Send | All |
 | **Intruder** | Send a prepared request into Intruder | Create-only today; no Intruder tab enumeration yet | All |
-| **Proxy** | Read HTTP & WebSocket history (incl. regex filters); toggle intercept | History may require data-access approval | All |
+| **Proxy** | Read HTTP & WebSocket history (incl. regex); get/set intercept | History may require data-access approval | All |
+| **Scope & info** | `is_in_scope`; `get_burp_version` | Suite-wide target scope + Burp version for agents | All |
 | **Organizer** | List organizer items (incl. regex) | Same approval model as history when enabled | All |
 | **Editors** | Read/write the **focused** message editor | Distinct from Repeater tab tools | All |
 | **Config** | Export / merge project & user JSON options | Opt-in “edit config” toggle; credential filtering available | All |

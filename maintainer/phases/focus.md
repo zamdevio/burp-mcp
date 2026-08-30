@@ -6,16 +6,14 @@
 
 ## Now
 
-1. ~~**Agent client guides**~~ — [`docs/guides/`](../../docs/guides/) + [`agent-guides.md`](agent-guides.md).
-2. ~~**scripts/mcp**~~ — `check.sh` / `test.sh` connectivity helpers.
-3. ~~**MCP tab catalog v1**~~ — Tools pane + `ToolCatalog` ([`mcp-tab-ui.md`](mcp-tab-ui.md)).
+1. ~~**Montoya gaps (slice)**~~ — `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`.
 
 ## Queued
 
 | Phase | Doc | Why |
 |-------|-----|-----|
+| Montoya next | [`montoya-gaps.md`](montoya-gaps.md) | Sitemap, scope mutate, project info, cookies… |
 | MCP tab v2/v3 | [`mcp-tab-ui.md`](mcp-tab-ui.md) | Per-tool enable; markdown docs in Burp |
-| Montoya gaps | [`montoya-gaps.md`](montoya-gaps.md) | `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`, … |
 | VitePress site | [`vitepress.md`](vitepress.md) | Publish: `apps/docs` + CF Pages (follow gform) |
 | Refactor Wave B | [`refactor.md`](refactor.md) | Split `Tools.kt` when touching many tools |
 
@@ -34,6 +32,7 @@
 - Repeater enforce + Send (+ Target-not-specified gate); live-smoke deploy script
 - User guide [`docs/repeater.md`](../../docs/repeater.md); VitePress phase [`vitepress.md`](vitepress.md)
 - Agent guides v1; `scripts/mcp` check/test; MCP tab Tools catalog v1
+- Montoya: `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`
 
 ## Not now
 

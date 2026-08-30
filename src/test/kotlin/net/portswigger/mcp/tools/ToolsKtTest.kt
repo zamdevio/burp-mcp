@@ -598,6 +598,71 @@ class ToolsKtTest {
             
             verify(exactly = 1) { proxy.disableIntercept() }
         }
+
+        @Test
+        fun `get proxy intercept state should work properly`() {
+            val proxy = mockk<Proxy>()
+            every { api.proxy() } returns proxy
+            every { proxy.isInterceptEnabled } returns true
+
+            runBlocking {
+                val result = client.callTool("get_proxy_intercept_state", emptyMap())
+                delay(100)
+                val text = result.expectTextContent()
+                assertTrue(text.contains("\"intercepting\":true") || text.contains("\"intercepting\": true"))
+            }
+
+            every { proxy.isInterceptEnabled } returns false
+            runBlocking {
+                val result = client.callTool("get_proxy_intercept_state", emptyMap())
+                delay(100)
+                val text = result.expectTextContent()
+                assertTrue(text.contains("\"intercepting\":false") || text.contains("\"intercepting\": false"))
+            }
+        }
+
+        @Test
+        fun `get burp version should return edition and build`() {
+            val burpSuite = mockk<burp.api.montoya.burpsuite.BurpSuite>()
+            val version = mockk<burp.api.montoya.core.Version>()
+            every { api.burpSuite() } returns burpSuite
+            every { burpSuite.version() } returns version
+            every { version.name() } returns "Burp Suite Professional"
+            every { version.edition() } returns BurpSuiteEdition.PROFESSIONAL
+            every { version.buildNumber() } returns 20260801L
+            every { version.toString() } returns "Burp Suite Professional 2026.8"
+
+            runBlocking {
+                val result = client.callTool("get_burp_version", emptyMap())
+                delay(100)
+                val text = result.expectTextContent()
+                assertTrue(text.contains("PROFESSIONAL"))
+                assertTrue(text.contains("20260801") || text.contains("2026.8"))
+            }
+        }
+
+        @Test
+        fun `is in scope should query Montoya Scope`() {
+            val scope = mockk<burp.api.montoya.scope.Scope>()
+            every { api.scope() } returns scope
+            every { scope.isInScope("https://example.com/") } returns true
+            every { scope.isInScope("https://out.example/") } returns false
+
+            runBlocking {
+                val inResult = client.callTool("is_in_scope", mapOf("url" to "https://example.com/"))
+                delay(100)
+                val inText = inResult.expectTextContent()
+                assertTrue(inText.contains("\"inScope\":true") || inText.contains("\"inScope\": true"))
+
+                val outResult = client.callTool("is_in_scope", mapOf("url" to "https://out.example/"))
+                delay(100)
+                val outText = outResult.expectTextContent()
+                assertTrue(outText.contains("\"inScope\":false") || outText.contains("\"inScope\": false"))
+            }
+
+            verify(exactly = 1) { scope.isInScope("https://example.com/") }
+            verify(exactly = 1) { scope.isInScope("https://out.example/") }
+        }
         
         @Test
         fun `config editing tools should respect config settings`() {

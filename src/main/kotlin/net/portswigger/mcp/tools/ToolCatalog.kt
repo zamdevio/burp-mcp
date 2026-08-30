@@ -66,6 +66,8 @@ object ToolCatalog {
         name.contains("proxy") || name.contains("websocket") -> "Proxy"
         name.contains("organizer") -> "Organizer"
         name.contains("collaborator") || name.contains("scanner") -> "Pro"
+        name == "is_in_scope" || name.contains("scope") -> "Scope"
+        name == "get_burp_version" || name == "get_project_info" -> "Info"
         name.startsWith("url_") || name.startsWith("base64_") ||
             name == "generate_random_string" -> "Utilities"
         name.contains("options") || name.contains("task_execution") -> "Config"
@@ -128,6 +130,18 @@ object ToolCatalog {
         ),
         entry("set_task_execution_engine_state", "Sets the state of Burp's task execution engine (paused or unpaused)"),
         entry("set_proxy_intercept_state", "Enables or disables Burp Proxy Intercept"),
+        entry(
+            "get_proxy_intercept_state",
+            "Returns whether Burp Proxy intercept is currently enabled (pairs with set_proxy_intercept_state).",
+        ),
+        entry(
+            "get_burp_version",
+            "Returns Burp Suite product name, edition, build number, and version string for agent context.",
+        ),
+        entry(
+            "is_in_scope",
+            "Returns whether the given URL is within Burp's Suite-wide target scope.",
+        ),
         entry("get_active_editor_contents", "Outputs the contents of the user's active message editor"),
         entry("set_active_editor_contents", "Sets the content of the user's active message editor"),
         entry("list_repeater_tabs", "Lists currently discoverable Burp Repeater tabs"),
