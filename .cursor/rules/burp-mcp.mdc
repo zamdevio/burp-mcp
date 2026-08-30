@@ -1,0 +1,35 @@
+---
+alwaysApply: true
+---
+# burp-mcp (Burp MCP Server extension)
+
+## Source of truth
+- **Sprint:** `maintainer/phases/focus.md`
+- **Repeater / Swing UI:** `maintainer/phases/repeater-ui.md`
+- **Montoya tool backlog:** `maintainer/phases/montoya-gaps.md`
+- **Refactor waves:** `maintainer/phases/refactor.md`
+- **Shipped receipts:** `maintainer/shipped/README.md` (check before re-implementing)
+- **Systems maps:** `maintainer/systems/README.md`
+- **Agent guides:** `maintainer/agents/README.md` · **Onboarding:** `maintainer/agents/onboarding.md` · **Rules:** `maintainer/agents/rules.md`
+- **Tree layout:** `maintainer/agents/tree.md` · `.cursor/rules/tree.mdc`
+- **Git:** `maintainer/agents/git.md` · `.cursor/rules/git.mdc`
+
+## Build / test gate
+- Required before claiming done: `./gradlew test`
+- Burp JAR: `./gradlew embedProxyJar` → `build/libs/burp-mcp-all.jar`
+
+## Hard constraints
+- **No Repeater registry** — no persistent tab maps; Burp UI is source of truth; re-discover every call.
+- **No** patching Burp Suite JAR; **no** runtime UI rule downloads from GitHub.
+- Swing: EDT; tab-targeted ops → select → settle → act → **restore** (see repeater-ui phase).
+- Fail safe on ambiguous UI — agent-readable errors, not wrong editor mutations.
+
+## Docs boundary
+- **`maintainer/**`** — contributor/agent only; not mirrored as end-user docs.
+- **`docs/**`** — user/contributor reference.
+- Root **README** — install and quick usage.
+
+## Adding tools
+- Prefer Montoya API when available (`maintainer/phases/montoya-gaps.md`).
+- Register via `tools/McpTool.kt` patterns; split domains out of monolithic `Tools.kt` per refactor phase.
+- Respect `security/` gates for HTTP, history, config editing.

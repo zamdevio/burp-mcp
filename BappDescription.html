@@ -1,0 +1,48 @@
+<p>
+	<strong>burp-mcp</strong> integrates Burp Suite with AI clients using the
+	<a href="https://modelcontextprotocol.io/">Model Context Protocol (MCP)</a>.
+	It is a GPL-3.0 derivative of PortSwigger’s
+	<a href="https://github.com/PortSwigger/mcp-server">official MCP Server extension</a>,
+	maintained at <a href="https://github.com/zamdevio/burp-mcp">github.com/zamdevio/burp-mcp</a>.
+	It does not replace the official BApp.
+</p>
+
+<p>
+	The extension runs an MCP server inside Burp so assistants can send HTTP, read proxy history,
+	operate Repeater tabs, and use other Burp tools — subject to the approval gates in the MCP tab.
+</p>
+
+<p>
+	<strong>Note:</strong> Any data sent to external tools via this extension is subject to their data processing
+	policies. Use only against targets you are authorized to test.
+</p>
+
+<h2>Features</h2>
+<ul>
+	<li>Send HTTP/1.1 and HTTP/2 requests from AI clients with optional approval and auto-approved targets</li>
+	<li>Access and filter proxy history (HTTP and WebSocket) with regex support</li>
+	<li>List, read, write, select, and rename individual Repeater tabs (live Burp UI)</li>
+	<li>Create Repeater tabs and send requests to Intruder</li>
+	<li>Generate and poll Burp Collaborator payloads (Professional only)</li>
+	<li>List scanner issues (Professional only)</li>
+	<li>Export and merge project and user configuration via JSON (opt-in)</li>
+	<li>Control proxy intercept, task execution engine, and the focused message editor</li>
+	<li>Encoding utilities (URL, Base64) and random string generation</li>
+	<li>Claude Desktop installer plus packaged stdio proxy for clients that cannot speak SSE</li>
+	<li>Organizer item listing</li>
+</ul>
+
+<h2>Usage</h2>
+<ol>
+	<li>Navigate to the MCP tab and enable the MCP server (default <code class="InlineCode">http://127.0.0.1:9876</code>).</li>
+	<li>Configure approval settings and auto-approved HTTP targets as needed.</li>
+	<li>Connect an SSE client, use <strong>Install to Claude Desktop</strong>, or run the packaged stdio proxy.</li>
+	<li>Call MCP tools from the client. See the project README for the current tool list.</li>
+</ol>
+
+<p>
+	<br>
+	Original work Copyright &copy; 2025-2026 PortSwigger Ltd.
+	<br>
+	Modifications Copyright &copy; 2026 zamdevio.
+</p>

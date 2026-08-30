@@ -1,0 +1,57 @@
+# Gradle / Kotlin
+.gradle/
+.kotlin/
+build/
+
+# Wrapper (keep the jar)
+!gradle/wrapper/gradle-wrapper.jar
+
+# Stdio proxy is fetched into build/proxy/ — do not vendor libs/
+libs/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code / editors ###
+.vscode/
+*.swp
+*~
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Local / secrets ###
+local.properties
+*.log
+hs_err_pid*
+replay_pid*
+
+### Burp ###
+*.burp
+*.burp2
+
+### Maintainer scratch ###
+maintainer/temp/*
+!maintainer/temp/.gitkeep

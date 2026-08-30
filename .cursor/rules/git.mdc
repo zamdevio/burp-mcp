@@ -1,0 +1,54 @@
+---
+description: Git commits, remotes, and push rules for burp-mcp
+alwaysApply: true
+---
+
+# Git
+
+Twin prose: `maintainer/agents/git.md`.
+
+## Remotes
+
+- **origin:** `zamdevio/burp-mcp` — this product
+- **upstream:** `PortSwigger/mcp-server` — official baseline (fetch/cherry-pick only)
+
+Do not push to upstream. Do not force-push `main` (except a user-requested history rewrite such as a fresh init).
+
+## When to commit
+
+Only when the user asks. Never commit secrets, Burp project files, or `maintainer/temp/` scratch (except `.gitkeep`).
+
+## Message format
+
+[Conventional Commits](https://www.conventionalcommits.org/):
+
+```text
+type(scope): subject
+
+<body: why, not a file list>
+```
+
+- **type:** `feat` · `fix` · `docs` · `chore` · `refactor` · `test` · `ci` · `build`
+- **scope:** short area (`init`, `repeater`, `proxy`, `docs`, `gradle`, …)
+- **subject:** imperative, lowercase, no trailing period, ≤72 chars for the whole first line
+- Body: wrap ~72 chars. Skip only for trivial one-liners.
+
+```text
+feat(repeater): list and read individual Repeater tabs
+
+Montoya cannot enumerate Repeater tabs; agents need live UI reads.
+```
+
+```text
+chore(init): seed burp-mcp from PortSwigger mcp-server
+```
+
+## Gates
+
+- Do not claim done without `./gradlew test`.
+- Do not `--no-verify` / skip hooks unless the user explicitly asks.
+- Amend only when the user asks **and** the last commit is ours, unpushed, and not on shared `main` after others pulled.
+
+## History
+
+This repo started as a **fresh init** of a GPL-3.0 derivative of PortSwigger/mcp-server. Credit lives in `docs/origins.md` and upstream notices — not in PortSwigger’s original commit graph.

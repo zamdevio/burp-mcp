@@ -1,0 +1,49 @@
+---
+description: Repo tree layout — Kotlin packages, split files, tests mirror main
+alwaysApply: true
+---
+
+# Tree / layout conventions
+
+Twin prose: `maintainer/agents/tree.md`.
+
+## Prefer this shape
+
+```text
+net/portswigger/mcp/<domain>/
+  Foo.kt              # one concern per file
+  Bar.kt
+```
+
+- **Major domains** get a package once a file grows fat or gains a second concern (`repeater/`, `tools/repeater/`, future `ui/`).
+- **Naming:** folders match concepts (`security`, `schema`, `config`) — avoid catch-all `util` unless truly generic.
+
+## Where code lives
+
+| Kind | Package / path |
+|------|----------------|
+| MCP registration helpers | `tools/McpTool.kt` |
+| Tool handlers | `tools/` (split by domain over time) |
+| `@Serializable` MCP / JSON DTOs | `schema/` or domain (e.g. `repeater/RepeaterTabModels.kt`) |
+| Montoya + approvals | `security/` |
+| Burp MCP tab UI | `config/` |
+| Swing Repeater discovery | `repeater/` → shared `ui/` |
+| Ktor SSE | `KtorServerManager.kt` |
+| Tests | `src/test/kotlin/...` same package as main |
+
+## Rules
+
+- Logic modules **import** DTOs; do not duplicate serializable types.
+- **Do not** put Swing tree walking inside tool handler bodies — call discovery layer.
+- Split **`Tools.kt`** into domain registration files when touching many tools ([`maintainer/phases/refactor.md`](maintainer/phases/refactor.md)).
+- Constants (error strings, UI labels, timeouts): colocate until `shared/constants/` exists, then move.
+
+## File size
+
+Prefer several focused files over a 400+ line god file.
+
+## Gradle
+
+- `./gradlew test` — required gate
+- Dependencies: `gradle/libs.versions.toml`
+- Stdio proxy: `./gradlew fetchProxyJar` → `build/proxy/mcp-proxy-all.jar` (not `libs/`)

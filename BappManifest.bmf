@@ -1,0 +1,13 @@
+Uuid: b670d63046a045a6b18197f6ec2a81f7
+ExtensionType: 1
+Name: burp-mcp
+RepoName: burp-mcp
+ScreenVersion: 0.1.0
+SerialVersion: 1
+MinPlatformVersion: 26
+ProOnly: False
+Author: zamdevio (derived from PortSwigger MCP Server)
+ShortDescription: Burp Suite MCP server for AI agents, including Repeater tab tools.
+EntryPoint: burp-mcp-all.jar
+BuildCommand: ./gradlew embedProxyJar
+SupportedProducts: Pro, Community
