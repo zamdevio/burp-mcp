@@ -36,6 +36,8 @@ Use only on systems you are authorized to test.
 | `get_active_repeater_tab` | Currently selected Repeater tab (not keyboard focus elsewhere) |
 | `select_repeater_tab` | Select a tab in the Repeater strip |
 | `set_repeater_tab_title` | Rename a tab |
+| `send_repeater_tab` | Click Repeater **Send** for a tab (select → settle → restore) |
+| `send_repeater_tab_and_get_response` | Send and wait for HTTP response in the editor (timeout optional) |
 
 **Focused editor (any message editor with focus):**
 
@@ -44,7 +46,7 @@ Use only on systems you are authorized to test.
 | `get_active_editor_contents` | Contents of the focused message editor |
 | `set_active_editor_contents` | Set contents if the focused editor is editable |
 
-Repeater caveats: [`limitations.md`](limitations.md). Design notes: [`maintainer/phases/repeater-ui.md`](../maintainer/phases/repeater-ui.md).
+Repeater deep dive (Target gate, agent loops): [`repeater.md`](repeater.md). Caveats: [`limitations.md`](limitations.md). Design notes: [`maintainer/phases/repeater-ui.md`](../maintainer/phases/repeater-ui.md).
 
 ---
 

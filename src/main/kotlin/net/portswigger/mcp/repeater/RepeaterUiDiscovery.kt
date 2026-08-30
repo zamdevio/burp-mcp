@@ -52,6 +52,30 @@ internal object RepeaterUiDiscovery {
         class NotInRepeater : DiscoveryError("<No active Repeater tab>")
         class EditorDidNotUpdate :
             DiscoveryError("<Repeater editor did not update; retry list_repeater_tabs then the operation>")
+        class SendButtonNotFound(hint: String? = null) : DiscoveryError(
+            if (hint.isNullOrBlank()) {
+                "<Repeater Send button not found>"
+            } else {
+                "<Repeater Send button not found; candidates: $hint>"
+            }
+        )
+        class AmbiguousSendButton(hint: String? = null) : DiscoveryError(
+            if (hint.isNullOrBlank()) {
+                "<Unable to uniquely identify Repeater Send button>"
+            } else {
+                "<Unable to uniquely identify Repeater Send button; candidates: $hint>"
+            }
+        )
+        class SendButtonDisabled : DiscoveryError("<Repeater Send button is disabled>")
+        class TargetMissing : DiscoveryError(
+            "<Repeater target is not specified; set Target in the Repeater toolbar " +
+                "(pencil next to Target) to https://hostname or http://hostname:port, " +
+                "or recreate the tab with create_repeater_tab / create_repeater_tab_http2 " +
+                "which sets the target. Do not Send until Target is set — " +
+                "otherwise Burp opens Configure target details. Then retry send_repeater_tab>"
+        )
+        class ResponseTimeout(timeoutMs: Long) :
+            DiscoveryError("<Repeater response timed out after ${timeoutMs}ms; retry send_repeater_tab_and_get_response>")
     }
 
     sealed class Outcome<out T> {
@@ -116,19 +140,18 @@ internal object RepeaterUiDiscovery {
                     if (editors.requestAmbiguous) {
                         return@withTab Outcome.Err(DiscoveryError.AmbiguousRequestEditor())
                     }
-                    if (editors.responseAmbiguous) {
-                        return@withTab Outcome.Err(DiscoveryError.AmbiguousResponseEditor())
-                    }
-                    val requestText = editors.request?.text
-                    val responseText = editors.response?.text
-                    val responseAvailable = isResponseAvailable(responseText)
+                    // Response ambiguity: omit response fields rather than failing the whole tab read.
+                    val responseText =
+                        if (editors.responseAmbiguous) null else editors.response?.text
+                    val responseAvailable =
+                        !editors.responseAmbiguous && isResponseAvailable(responseText)
                     Outcome.Ok(
                         RepeaterTabDetail(
                             id = RepeaterTabId.fromIndex(index),
                             name = tabTitle(strip, index),
                             index = index,
                             selected = wasSelected,
-                            request = requestText,
+                            request = editors.request?.text,
                             response = if (responseAvailable) responseText else null,
                             requestAvailable = editors.request != null,
                             responseAvailable = responseAvailable,

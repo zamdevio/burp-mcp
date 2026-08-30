@@ -16,6 +16,7 @@ import kotlinx.serialization.json.Json
 import net.portswigger.mcp.config.McpConfig
 import net.portswigger.mcp.schema.encodeHistoryItem
 import net.portswigger.mcp.schema.toSerializableForm
+import net.portswigger.mcp.repeater.RepeaterSend
 import net.portswigger.mcp.repeater.RepeaterUiDiscovery
 import net.portswigger.mcp.security.DataAccessSecurity
 import net.portswigger.mcp.security.DataAccessType
@@ -490,6 +491,29 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
             is RepeaterUiDiscovery.Outcome.Err -> result.error.message
         }
     }
+
+    mcpTool<SendRepeaterTab>(
+        "Clicks the Repeater toolbar Send button for the given tab (select → settle → ensure Target → " +
+            "click Send → restore). Burp 2024.x often requires a real button click (Ctrl+Enter is a no-op). " +
+            "Does not wait for a response — use send_repeater_tab_and_get_response for that."
+    ) {
+        when (val result = RepeaterSend.sendTab(api, tabId)) {
+            is RepeaterUiDiscovery.Outcome.Ok -> result.value
+            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
+        }
+    }
+
+    mcpTool<SendRepeaterTabAndGetResponse>(
+        "Sends the given Repeater tab and waits until the response editor shows an HTTP response " +
+            "(or timeout_ms elapses). Restores prior suite/Repeater selection afterward. " +
+            "timeout_ms defaults to 30000; clamped to 1000..120000."
+    ) {
+        val timeout = timeoutMs ?: RepeaterSend.DEFAULT_RESPONSE_TIMEOUT_MS
+        when (val result = RepeaterSend.sendTabAndGetResponse(api, tabId, timeout)) {
+            is RepeaterUiDiscovery.Outcome.Ok -> result.value
+            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
+        }
+    }
 }
 
 fun getActiveEditor(api: MontoyaApi): JTextArea? {
@@ -609,6 +633,15 @@ data class SelectRepeaterTab(val tabId: String)
 
 @Serializable
 data class SetRepeaterTabTitle(val tabId: String, val title: String)
+
+@Serializable
+data class SendRepeaterTab(val tabId: String)
+
+@Serializable
+data class SendRepeaterTabAndGetResponse(
+    val tabId: String,
+    val timeoutMs: Long? = null,
+)
 
 @Serializable
 data class GetScannerIssues(override val count: Int, override val offset: Int) : Paginated

@@ -2,7 +2,7 @@
 
 **Approach:** Montoya where it exists + **stateless** Swing discovery from `suiteFrame()`. **No** Repeater manager, registry, cache, or shadow state.
 
-**Status:** Tab list + read/write **working on live Burp** (2026.x); **enforce** select/settle/restore **in code** (see [`focus.md`](focus.md)); Send **next**.
+**Status:** Tab list + read/write + **enforce** + **Send** tools in code (see [`focus.md`](focus.md)). Live smoke after deploy.
 
 ---
 
@@ -50,8 +50,12 @@ Burp remains the **only** source of truth — re-discover on every tool call.
 | `get_active_repeater_tab` | Selected Repeater tab (not keyboard focus) |
 | `select_repeater_tab` | `JTabbedPane` selection |
 | `set_repeater_tab_title` | Tab strip rename |
+| `send_repeater_tab` | Toolbar Send (`RepeaterSend`); blocks if Target not specified |
+| `send_repeater_tab_and_get_response` | Send + poll response editor |
 
 **IDs:** `repeater-tab-{index}` — reorder/close invalidates; re-list before mutate.
+
+User guide: [`docs/repeater.md`](../../docs/repeater.md).
 
 ---
 
@@ -80,14 +84,11 @@ Burp remains the **only** source of truth — re-discover on every tool call.
 
 ---
 
-## Planned tools
+## Optional later
 
 | Tool | Notes |
 |------|--------|
-| `send_repeater_tab` | Click Send / safe shortcut — Swing |
-| `send_repeater_tab_and_get_response` | Send + poll response editor until HTTP/ or timeout |
-
-Optional later: `set_repeater_tab_target` if target field is uniquely discoverable.
+| `set_repeater_tab_target` | If target field is uniquely discoverable without dialogs |
 
 ---
 
@@ -106,7 +107,7 @@ Optional later: `set_repeater_tab_target` if target field is uniquely discoverab
 
 - Agent reads/writes a chosen tab without manual focus hacks.
 - No persistent tab state in extension.
-- `./gradlew test` passes; limitations documented in **`docs/tools.md`**.
+- `./gradlew test` passes; limitations + workflows in **`docs/repeater.md`** / **`docs/limitations.md`**.
 - Ambiguous discovery → explicit error, not wrong mutation.
 
 ---
