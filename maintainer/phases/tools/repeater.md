@@ -48,8 +48,8 @@ Goal: after an agentic Repeater flow, leave readable notes for the security engi
 
 | MCP tool | Capability | Path | Status | Notes |
 |----------|------------|------|--------|-------|
-| `get_repeater_tab_notes` | Read Notes panel for a tab | Swing | todo | Discover Notes UI; select/settle/restore |
-| `set_repeater_tab_notes` | Write/replace Notes for a tab | Swing | todo | Fail safe if ambiguous |
+| `get_repeater_tab_notes` | Read Notes panel for a tab | Swing | done | Select/settle/restore |
+| `set_repeater_tab_notes` | Write/replace Notes for a tab | Swing | done | Fail safe if ambiguous |
 | `append_repeater_tab_notes` | Append to Notes | Swing | todo | Optional nicety |
 
 ---
@@ -94,7 +94,7 @@ Burp Repeater supports grouping tabs. Agents need group-aware list + mutate for 
 
 ## Suggested implement order
 
-1. Notes get/set (high agentic value, contained UI)
+1. ~~Notes get/set~~
 2. Close single tab
 3. Groups list + move/rename
 4. Close group / reorder

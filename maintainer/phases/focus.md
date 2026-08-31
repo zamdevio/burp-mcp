@@ -6,14 +6,14 @@
 
 ## Now
 
-1. **Repeater Notes** — `get_repeater_tab_notes` / `set_repeater_tab_notes` ([`tools/repeater.md`](tools/repeater.md))
-2. Next after that: Target **`list_scope_rules`** spike ([`tools/target.md`](tools/target.md))
+1. **Target scope list** — `list_scope_rules` spike ([`tools/target.md`](tools/target.md))
+2. Next: `remove_scope_rule` after list spike
 
 ## Queued
 
 | Phase | Doc | Why |
 |-------|-----|-----|
-| Target scope table CRUD | [`tools/target.md`](tools/target.md) | List/remove/edit after list spike |
+| Repeater groups / close tab | [`tools/repeater.md`](tools/repeater.md) | Tab organization |
 | Sitemap (+ approval) | [`tools/target.md`](tools/target.md) · [`montoya-gaps.md`](montoya-gaps.md) | Paginated site map |
 | MCP tab v2/v3 | [`mcp-tab-ui.md`](mcp-tab-ui.md) | Per-tool enable; markdown docs in Burp |
 | VitePress site | [`vitepress.md`](vitepress.md) | Publish: `apps/docs` + CF Pages (follow gform) |
@@ -37,6 +37,7 @@
 - Montoya: `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope`
 - Montoya: `include_in_scope`, `exclude_from_scope`, `get_project_info`
 - Tool coverage ledgers: [`tools/`](tools/README.md) (`repeater.md`, `target.md`)
+- Repeater Notes: `get_repeater_tab_notes`, `set_repeater_tab_notes`
 
 ## Not now
 

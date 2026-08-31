@@ -545,6 +545,26 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
         }
     }
 
+    mcpTool<GetRepeaterTabNotes>(
+        "Returns the Notes text for a Repeater tab (select → settle → read Notes panel → restore). " +
+            "Empty string when the tab has no notes yet. Fails if the Notes editor cannot be uniquely identified."
+    ) {
+        when (val result = RepeaterUiDiscovery.getTabNotes(api, tabId)) {
+            is RepeaterUiDiscovery.Outcome.Ok -> result.value
+            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
+        }
+    }
+
+    mcpTool<SetRepeaterTabNotes>(
+        "Replaces the Notes text for a Repeater tab (select → settle → write Notes panel → restore). " +
+            "Use for agent-to-human handoff after an automated Repeater flow."
+    ) {
+        when (val result = RepeaterUiDiscovery.setTabNotes(api, tabId, notes)) {
+            is RepeaterUiDiscovery.Outcome.Ok -> result.value
+            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
+        }
+    }
+
     mcpTool<SendRepeaterTab>(
         "Clicks the Repeater toolbar Send button for the given tab (select → settle → ensure Target → " +
             "click Send → restore). Burp 2024.x often requires a real button click (Ctrl+Enter is a no-op). " +
@@ -715,6 +735,12 @@ data class SelectRepeaterTab(val tabId: String)
 
 @Serializable
 data class SetRepeaterTabTitle(val tabId: String, val title: String)
+
+@Serializable
+data class GetRepeaterTabNotes(val tabId: String)
+
+@Serializable
+data class SetRepeaterTabNotes(val tabId: String, val notes: String)
 
 @Serializable
 data class SendRepeaterTab(val tabId: String)

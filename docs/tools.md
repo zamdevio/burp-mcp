@@ -36,6 +36,8 @@ Use only on systems you are authorized to test.
 | `get_active_repeater_tab` | Currently selected Repeater tab (not keyboard focus elsewhere) |
 | `select_repeater_tab` | Select a tab in the Repeater strip |
 | `set_repeater_tab_title` | Rename a tab |
+| `get_repeater_tab_notes` | Read the tab Notes panel |
+| `set_repeater_tab_notes` | Replace tab Notes (agent handoff) |
 | `send_repeater_tab` | Click Repeater **Send** for a tab (select → settle → restore) |
 | `send_repeater_tab_and_get_response` | Send and wait for HTTP response in the editor (timeout optional) |
 

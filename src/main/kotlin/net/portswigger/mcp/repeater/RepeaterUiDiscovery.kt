@@ -69,6 +69,14 @@ internal object RepeaterUiDiscovery {
         )
         class ResponseTimeout(timeoutMs: Long) :
             DiscoveryError("<Repeater response timed out after ${timeoutMs}ms; retry send_repeater_tab_and_get_response>")
+        class NotesNotFound :
+            DiscoveryError("<Repeater Notes editor not found; expand the Notes panel if collapsed>")
+        class AmbiguousNotesEditor :
+            DiscoveryError("<Unable to uniquely identify Repeater Notes editor>")
+        class NotesNotEditable :
+            DiscoveryError("<Repeater Notes editor is not editable>")
+        class NotesDidNotUpdate :
+            DiscoveryError("<Repeater Notes did not update; retry list_repeater_tabs then the operation>")
     }
 
     sealed class Outcome<out T> {
@@ -215,6 +223,30 @@ internal object RepeaterUiDiscovery {
                 }
                 discovered.tabStrip.setTitleAt(index, trimmed)
                 Outcome.Ok("Repeater tab title set to \"$trimmed\"")
+            }
+        }
+    }
+
+    fun getTabNotes(api: MontoyaApi, tabId: String): Outcome<String> = runOnEdt {
+        when (val resolved = resolveTab(api, tabId)) {
+            is Outcome.Err -> resolved
+            is Outcome.Ok -> {
+                val (discovered, index) = resolved.value
+                RepeaterTabSession.withTab(discovered, index) {
+                    readNotesWhileSelected(discovered, index)
+                }
+            }
+        }
+    }
+
+    fun setTabNotes(api: MontoyaApi, tabId: String, notes: String): Outcome<String> = runOnEdt {
+        when (val resolved = resolveTab(api, tabId)) {
+            is Outcome.Err -> resolved
+            is Outcome.Ok -> {
+                val (discovered, index) = resolved.value
+                RepeaterTabSession.withTab(discovered, index) {
+                    writeNotesWhileSelected(discovered, index, tabId, notes)
+                }
             }
         }
     }
@@ -386,6 +418,16 @@ internal object RepeaterUiDiscovery {
             else -> Outcome.Ok(editors.response!!.text)
         }
     }
+
+    private fun readNotesWhileSelected(discovered: DiscoveredRepeater, index: Int): Outcome<String> =
+        RepeaterNotes.readWhileSelected(discovered, index)
+
+    private fun writeNotesWhileSelected(
+        discovered: DiscoveredRepeater,
+        index: Int,
+        tabId: String,
+        notes: String,
+    ): Outcome<String> = RepeaterNotes.writeWhileSelected(discovered, index, tabId, notes)
 
     private fun writeRequestWhileSelected(
         discovered: DiscoveredRepeater,

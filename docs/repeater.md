@@ -40,8 +40,20 @@ Creating a tab through Montoya typically **sets Target**. Pasting a request into
 | `get_active_repeater_tab` | Strip selection (suite Repeater selected) |
 | `select_repeater_tab` | Select strip tab (leaves selection) |
 | `set_repeater_tab_title` | Rename |
+| `get_repeater_tab_notes` / `set_repeater_tab_notes` | Notes panel (select → settle → restore) |
 
 Tab-targeted get/set briefly switch selection, then **restore** the prior suite/Repeater tab. A short flicker is expected.
+
+---
+
+## Notes
+
+| Tool | Notes |
+|------|--------|
+| `get_repeater_tab_notes` | Text from the Repeater Notes panel for `tabId`; empty string if none yet |
+| `set_repeater_tab_notes` | Replace Notes for handoff to a human reviewer |
+
+If Burp hides the Notes panel, expand it in the UI and retry. Ambiguous discovery returns a stable error (no wrong editor writes).
 
 ---
 
@@ -81,6 +93,7 @@ Messages are wrapped for agents (examples):
 - `<Repeater Send button not found…>` / disabled
 - `<Repeater response timed out after …ms; …>`
 - `<Repeater editor did not update; …>`
+- `<Repeater Notes editor not found; …>` / `<Unable to uniquely identify Repeater Notes editor>`
 - `<Unable to uniquely identify Repeater … editor>`
 
 Prefer fixing Target / re-listing over retrying Send blindly.

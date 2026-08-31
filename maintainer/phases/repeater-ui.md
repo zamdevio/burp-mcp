@@ -50,6 +50,7 @@ Burp remains the **only** source of truth — re-discover on every tool call.
 | `get_active_repeater_tab` | Selected Repeater tab (not keyboard focus) |
 | `select_repeater_tab` | `JTabbedPane` selection |
 | `set_repeater_tab_title` | Tab strip rename |
+| `get_repeater_tab_notes` / `set_repeater_tab_notes` | Notes panel read/write |
 | `send_repeater_tab` | Toolbar Send (`RepeaterSend`); blocks if Target not specified |
 | `send_repeater_tab_and_get_response` | Send + poll response editor |
 

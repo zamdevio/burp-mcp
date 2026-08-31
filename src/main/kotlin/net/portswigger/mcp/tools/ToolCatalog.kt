@@ -155,6 +155,8 @@ object ToolCatalog {
         entry("get_active_repeater_tab", "Returns the currently selected Repeater tab"),
         entry("select_repeater_tab", "Selects the given Repeater tab"),
         entry("set_repeater_tab_title", "Renames a Repeater tab"),
+        entry("get_repeater_tab_notes", "Returns the Notes text for a Repeater tab"),
+        entry("set_repeater_tab_notes", "Replaces the Notes text for a Repeater tab"),
         entry("send_repeater_tab", "Clicks Repeater Send for a tab (requires Target set)"),
         entry("send_repeater_tab_and_get_response", "Sends a Repeater tab and waits for an HTTP response"),
     )
