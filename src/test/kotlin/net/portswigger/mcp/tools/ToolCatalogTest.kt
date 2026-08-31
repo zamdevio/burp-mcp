@@ -18,6 +18,7 @@ class ToolCatalogTest {
         val names = ToolCatalog.all().map { it.name }.toSet()
         assertTrue(names.contains("url_encode"))
         assertTrue(names.contains("list_repeater_tabs"))
+        assertTrue(names.contains("get_repeater_context"))
         assertTrue(names.contains("send_repeater_tab"))
         assertTrue(names.contains("send_http1_request"))
         assertTrue(names.contains("get_scanner_issues"))

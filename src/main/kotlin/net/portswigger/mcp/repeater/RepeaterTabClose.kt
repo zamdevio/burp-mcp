@@ -98,7 +98,7 @@ internal object RepeaterTabClose {
             ?: return RepeaterUiDiscovery.Outcome.Err(
                 RepeaterUiDiscovery.DiscoveryError.InvalidTabId(tabId)
             )
-        return when (val discovered = RepeaterUiDiscovery.discoverRepeater(api)) {
+        return when (val discovered = RepeaterUiDiscovery.prepareRepeater(api)) {
             is RepeaterUiDiscovery.Outcome.Err -> discovered
             is RepeaterUiDiscovery.Outcome.Ok -> {
                 val strip = discovered.value.tabStrip

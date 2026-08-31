@@ -1,6 +1,7 @@
 package net.portswigger.mcp.repeater
 
 import burp.api.montoya.MontoyaApi
+import net.portswigger.mcp.ui.SuiteUiSession
 import java.awt.Component
 import java.awt.Container
 import javax.swing.JTabbedPane
@@ -69,8 +70,11 @@ internal object RepeaterUiDiscovery {
         )
         class ResponseTimeout(timeoutMs: Long) :
             DiscoveryError("<Repeater response timed out after ${timeoutMs}ms; retry send_repeater_tab_and_get_response>")
-        class NotesNotFound :
-            DiscoveryError("<Repeater Notes editor not found; expand the Notes panel if collapsed>")
+        class NotesNotFound(detail: String? = null) :
+            DiscoveryError(
+                "<Repeater Notes editor not found; open the Notes sidebar (east rail) and retry>" +
+                    (detail?.take(400)?.let { " <$it>" }.orEmpty()),
+            )
         class AmbiguousNotesEditor :
             DiscoveryError("<Unable to uniquely identify Repeater Notes editor>")
         class NotesNotEditable :
@@ -100,28 +104,33 @@ internal object RepeaterUiDiscovery {
         val suiteRepeaterIndex: Int,
         val repeaterRoot: Component,
         val tabStrip: JTabbedPane,
+        /** Full suite frame ([discoverRepeaterFromRoot] root) — Notes inspector may sit outside [repeaterRoot]. */
+        val suiteFrame: Component,
     )
 
     fun listTabs(api: MontoyaApi): Outcome<List<RepeaterTabInfo>> = runOnEdt {
-        when (val discovered = discoverRepeater(api)) {
+        when (val discovered = prepareRepeater(api)) {
             is Outcome.Err -> discovered
             is Outcome.Ok -> Outcome.Ok(buildTabInfos(discovered.value))
         }
     }
 
+    fun getRepeaterContext(api: MontoyaApi): Outcome<RepeaterContextSnapshot> =
+        RepeaterContext.captureEnsuringRepeater(api)
+
     fun getActiveTab(api: MontoyaApi): Outcome<RepeaterTabInfo> = runOnEdt {
-        when (val discovered = discoverRepeater(api)) {
+        when (val discovered = prepareRepeater(api)) {
             is Outcome.Err -> when (discovered.error) {
                 is DiscoveryError.RepeaterNotFound -> Outcome.Err(DiscoveryError.NotInRepeater())
                 else -> discovered
             }
             is Outcome.Ok -> {
                 val strip = discovered.value.tabStrip
-                if (!isRepeaterSuiteTabSelected(discovered.value) || strip.tabCount == 0) {
+                if (strip.tabCount == 0) {
                     Outcome.Err(DiscoveryError.NotInRepeater())
                 } else {
                     val index = strip.selectedIndex
-                    if (index < 0) {
+                    if (index < 0 || isChromeTab(strip, index)) {
                         Outcome.Err(DiscoveryError.NotInRepeater())
                     } else {
                         Outcome.Ok(buildTabInfo(discovered.value, index))
@@ -237,7 +246,7 @@ internal object RepeaterUiDiscovery {
             is Outcome.Ok -> {
                 val (discovered, index) = resolved.value
                 RepeaterTabSession.withTab(discovered, index) {
-                    readNotesWhileSelected(discovered, index)
+                    readNotesWhileSelected(discovered, index, api)
                 }
             }
         }
@@ -249,17 +258,46 @@ internal object RepeaterUiDiscovery {
             is Outcome.Ok -> {
                 val (discovered, index) = resolved.value
                 RepeaterTabSession.withTab(discovered, index) {
-                    writeNotesWhileSelected(discovered, index, tabId, notes)
+                    writeNotesWhileSelected(discovered, index, tabId, notes, api)
                 }
             }
         }
     }
+
+    fun scanNotesUi(api: MontoyaApi, tabId: String, needle: String?): Outcome<RepeaterNotesScanner.NotesUiScanResult> =
+        runOnEdt {
+            when (val resolved = resolveTab(api, tabId)) {
+                is Outcome.Err -> resolved
+                is Outcome.Ok -> {
+                    val (discovered, index) = resolved.value
+                    RepeaterTabSession.withTab(discovered, index) {
+                        Outcome.Ok(RepeaterNotesScanner.scanRepeaterNotesUi(discovered, index, needle))
+                    }
+                }
+            }
+        }
 
     fun closeTab(api: MontoyaApi, tabId: String): Outcome<String> =
         RepeaterTabClose.closeTab(api, tabId)
 
     fun closeOtherTabs(api: MontoyaApi, keepTabId: String): Outcome<String> =
         RepeaterTabClose.closeOtherTabs(api, keepTabId)
+
+    fun ensureRepeaterSuiteSelected(discovered: DiscoveredRepeater) {
+        SuiteUiSession.ensureSuiteTabSelected(
+            discovered.suiteTabbedPane,
+            discovered.suiteRepeaterIndex,
+        )
+    }
+
+    internal fun prepareRepeater(api: MontoyaApi): Outcome<DiscoveredRepeater> =
+        when (val discovered = discoverRepeater(api)) {
+            is Outcome.Err -> discovered
+            is Outcome.Ok -> {
+                ensureRepeaterSuiteSelected(discovered.value)
+                discovered
+            }
+        }
 
     // --- discovery primitives (package-visible for tests) ---
 
@@ -290,6 +328,7 @@ internal object RepeaterUiDiscovery {
                 suiteRepeaterIndex = repeaterIndex,
                 repeaterRoot = repeaterRoot,
                 tabStrip = tabStrips.single(),
+                suiteFrame = root,
             )
         )
     }
@@ -429,15 +468,16 @@ internal object RepeaterUiDiscovery {
         }
     }
 
-    private fun readNotesWhileSelected(discovered: DiscoveredRepeater, index: Int): Outcome<String> =
-        RepeaterNotes.readWhileSelected(discovered, index)
+    private fun readNotesWhileSelected(discovered: DiscoveredRepeater, index: Int, api: MontoyaApi): Outcome<String> =
+        RepeaterNotes.readWhileSelected(discovered, index, api)
 
     private fun writeNotesWhileSelected(
         discovered: DiscoveredRepeater,
         index: Int,
         tabId: String,
         notes: String,
-    ): Outcome<String> = RepeaterNotes.writeWhileSelected(discovered, index, tabId, notes)
+        api: MontoyaApi,
+    ): Outcome<String> = RepeaterNotes.writeWhileSelected(discovered, index, tabId, notes, api)
 
     private fun writeRequestWhileSelected(
         discovered: DiscoveredRepeater,
@@ -482,7 +522,7 @@ internal object RepeaterUiDiscovery {
     private fun resolveTab(api: MontoyaApi, tabId: String): Outcome<Pair<DiscoveredRepeater, Int>> {
         val index = RepeaterTabId.parseIndex(tabId)
             ?: return Outcome.Err(DiscoveryError.InvalidTabId(tabId))
-        return when (val discovered = discoverRepeater(api)) {
+        return when (val discovered = prepareRepeater(api)) {
             is Outcome.Err -> discovered
             is Outcome.Ok -> {
                 val strip = discovered.value.tabStrip

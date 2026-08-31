@@ -16,8 +16,7 @@ import kotlinx.serialization.json.Json
 import net.portswigger.mcp.config.McpConfig
 import net.portswigger.mcp.schema.encodeHistoryItem
 import net.portswigger.mcp.schema.toSerializableForm
-import net.portswigger.mcp.repeater.RepeaterSend
-import net.portswigger.mcp.repeater.RepeaterUiDiscovery
+import net.portswigger.mcp.repeater.RepeaterToolHandlers
 import net.portswigger.mcp.security.DataAccessSecurity
 import net.portswigger.mcp.security.DataAccessType
 import net.portswigger.mcp.security.HttpRequestSecurity
@@ -457,7 +456,23 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
         "Editor text has been set"
     }
 
-    // --- Repeater tab inspection (stateless Swing discovery; Burp is source of truth) ---
+    // --- Repeater (Swing discovery; JSON envelope + live context on every tool) ---
+
+    mcpTool(
+        "get_repeater_context",
+        "Live Repeater snapshot: suite tool focus, selected message tab, tab list. Not cached — " +
+            "prefer this over guessing tab ids; every other Repeater tool also embeds the same context shape."
+    ) {
+        RepeaterToolHandlers.getContext(api)
+    }
+
+    mcpTool<ScanRepeaterNotesUi>(
+        "Scans Swing components for Repeater Notes text (debug/calibration). " +
+            "Type a unique string in the east Notes panel, pass it as needle, and inspect candidates " +
+            "(matchesNeedle / inSidebarNotesPanel) to find the real editor."
+    ) {
+        RepeaterToolHandlers.scanNotesUi(api, tabId, needle)
+    }
 
     mcpTool(
         "list_repeater_tabs",
@@ -465,44 +480,27 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
             "can change if tabs are closed or reordered — call this again before mutating a tab. " +
             "Does not use keyboard focus; discovers the live Repeater UI."
     ) {
-        when (val result = RepeaterUiDiscovery.listTabs(api)) {
-            is RepeaterUiDiscovery.Outcome.Ok ->
-                if (result.value.isEmpty()) {
-                    "[]"
-                } else {
-                    Json.encodeToString(result.value)
-                }
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.listTabs(api)
     }
 
     mcpTool<GetRepeaterTab>(
         "Returns structured information for a Repeater tab, including request/response when uniquely identifiable. " +
             "tab_id looks like repeater-tab-0 from list_repeater_tabs."
     ) {
-        when (val result = RepeaterUiDiscovery.getTab(api, tabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> Json.encodeToString(result.value)
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.getTab(api, tabId)
     }
 
     mcpTool<GetRepeaterTabRequest>(
         "Returns the raw HTTP request currently in the given Repeater tab's request editor."
     ) {
-        when (val result = RepeaterUiDiscovery.getTabRequest(api, tabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.getTabRequest(api, tabId)
     }
 
     mcpTool<GetRepeaterTabResponse>(
         "Returns the HTTP response currently displayed in the given Repeater tab. " +
             "Returns <No response available> when no response has been received (distinct from an empty body)."
     ) {
-        when (val result = RepeaterUiDiscovery.getTabResponse(api, tabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.getTabResponse(api, tabId)
     }
 
     mcpTool<SetRepeaterTabRequest>(
@@ -510,80 +508,56 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
             "Fails safely if the tab or editable request editor cannot be uniquely identified. " +
             "Host, path, headers, and body are all part of this raw request text."
     ) {
-        when (val result = RepeaterUiDiscovery.setTabRequest(api, tabId, request)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.setTabRequest(api, tabId, request)
     }
 
     mcpTool(
         "get_active_repeater_tab",
-        "Returns the currently selected Repeater tab (suite Repeater selected + that tab strip selection). " +
-            "This is different from get_active_editor_contents, which returns whichever JTextArea has keyboard focus."
+        "Returns the currently selected Repeater message tab from the live UI (after ensuring the Repeater suite tab). " +
+            "Distinct from get_active_editor_contents (keyboard focus)."
     ) {
-        when (val result = RepeaterUiDiscovery.getActiveTab(api)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> Json.encodeToString(result.value)
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.getActiveTab(api)
     }
 
     mcpTool<SelectRepeaterTab>(
-        "Selects the given Repeater tab via Swing JTabbedPane selection (also focuses the Repeater suite tab)."
+        "Selects the given Repeater tab via Swing JTabbedPane selection (also focuses the Repeater suite tab). " +
+            "Optional for agents — other tools auto-select by tab_id."
     ) {
-        when (val result = RepeaterUiDiscovery.selectTab(api, tabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.selectTab(api, tabId)
     }
 
     mcpTool<SetRepeaterTabTitle>(
         "Renames a Repeater tab via the discovered tab strip title. Relies on Swing JTabbedPane.setTitleAt."
     ) {
-        when (val result = RepeaterUiDiscovery.setTabTitle(api, tabId, title)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.setTabTitle(api, tabId, title)
     }
 
     mcpTool<GetRepeaterTabNotes>(
-        "Returns the Notes text for a Repeater tab (select → settle → read Notes panel → restore). " +
+        "Returns the Notes text for a Repeater tab (select → settle → read visible Notes panel → restore). " +
             "Empty string when the tab has no notes yet. Fails if the Notes editor cannot be uniquely identified."
     ) {
-        when (val result = RepeaterUiDiscovery.getTabNotes(api, tabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.getTabNotes(api, tabId)
     }
 
     mcpTool<SetRepeaterTabNotes>(
-        "Replaces the Notes text for a Repeater tab (select → settle → write Notes panel → restore). " +
+        "Replaces the Notes text for a Repeater tab (select → settle → write visible Notes panel → restore). " +
             "Use for agent-to-human handoff after an automated Repeater flow."
     ) {
-        when (val result = RepeaterUiDiscovery.setTabNotes(api, tabId, notes)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.setTabNotes(api, tabId, notes)
     }
 
     mcpTool<CloseRepeaterTab>(
         "Closes one Repeater message tab by id (JTabbedPane removeTabAt). " +
-            "Refuses to close the last message tab. Response includes remaining tab count; " +
-            "call list_repeater_tabs when you need names after close/reorder."
+            "Refuses to close the last message tab. Envelope includes remaining tab count."
     ) {
-        when (val result = RepeaterUiDiscovery.closeTab(api, tabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.closeTab(api, tabId)
     }
 
     mcpTool<CloseOtherRepeaterTabs>(
         "Closes every Repeater message tab except keep_tab_id (context menu Close other tabs). " +
-            "Destructive — response includes remaining tab count; list_repeater_tabs for names."
+            "Destructive — envelope includes remaining tab count."
     ) {
-        when (val result = RepeaterUiDiscovery.closeOtherTabs(api, keepTabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.closeOtherTabs(api, keepTabId)
     }
 
     mcpTool<SendRepeaterTab>(
@@ -591,10 +565,7 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
             "click Send → restore). Burp 2024.x often requires a real button click (Ctrl+Enter is a no-op). " +
             "Does not wait for a response — use send_repeater_tab_and_get_response for that."
     ) {
-        when (val result = RepeaterSend.sendTab(api, tabId)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        RepeaterToolHandlers.sendTab(api, tabId)
     }
 
     mcpTool<SendRepeaterTabAndGetResponse>(
@@ -602,11 +573,8 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
             "(or timeout_ms elapses). Restores prior suite/Repeater selection afterward. " +
             "timeout_ms defaults to 30000; clamped to 1000..120000."
     ) {
-        val timeout = timeoutMs ?: RepeaterSend.DEFAULT_RESPONSE_TIMEOUT_MS
-        when (val result = RepeaterSend.sendTabAndGetResponse(api, tabId, timeout)) {
-            is RepeaterUiDiscovery.Outcome.Ok -> result.value
-            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
-        }
+        val timeout = timeoutMs ?: net.portswigger.mcp.repeater.RepeaterSend.DEFAULT_RESPONSE_TIMEOUT_MS
+        RepeaterToolHandlers.sendTabAndGetResponse(api, tabId, timeout)
     }
 }
 
@@ -759,6 +727,9 @@ data class SetRepeaterTabTitle(val tabId: String, val title: String)
 
 @Serializable
 data class GetRepeaterTabNotes(val tabId: String)
+
+@Serializable
+data class ScanRepeaterNotesUi(val tabId: String, val needle: String? = null)
 
 @Serializable
 data class SetRepeaterTabNotes(val tabId: String, val notes: String)

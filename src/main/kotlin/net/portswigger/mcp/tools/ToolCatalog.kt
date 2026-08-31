@@ -147,6 +147,14 @@ object ToolCatalog {
         entry("get_project_info", "Returns the current Burp project name and id for agent context."),
         entry("get_active_editor_contents", "Outputs the contents of the user's active message editor"),
         entry("set_active_editor_contents", "Sets the content of the user's active message editor"),
+        entry(
+            "get_repeater_context",
+            "Live Repeater snapshot (suite focus, tabs, selection); not cached.",
+        ),
+        entry(
+            "scan_repeater_notes_ui",
+            "Scan Swing tree for Notes text; pass needle after typing in the Notes panel.",
+        ),
         entry("list_repeater_tabs", "Lists currently discoverable Burp Repeater tabs"),
         entry("get_repeater_tab", "Returns structured information for a Repeater tab"),
         entry("get_repeater_tab_request", "Returns the raw HTTP request in a Repeater tab"),
