@@ -533,17 +533,38 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
     }
 
     mcpTool<GetRepeaterTabNotes>(
-        "Returns the Notes text for a Repeater tab (select → settle → read visible Notes panel → restore). " +
-            "Empty string when the tab has no notes yet. Fails if the Notes editor cannot be uniquely identified."
+        "Returns the Notes text for a Repeater tab (select → settle → read tab Annotations → restore). " +
+            "Empty string when the tab has no notes yet."
     ) {
         RepeaterToolHandlers.getTabNotes(api, tabId)
     }
 
     mcpTool<SetRepeaterTabNotes>(
-        "Replaces the Notes text for a Repeater tab (select → settle → write visible Notes panel → restore). " +
+        "Replaces the Notes text for a Repeater tab (select → settle → write tab Annotations → restore). " +
             "Use for agent-to-human handoff after an automated Repeater flow."
     ) {
         RepeaterToolHandlers.setTabNotes(api, tabId, notes)
+    }
+
+    mcpTool(
+        "get_repeater_east_sidebar_state",
+        "Reads the Repeater east inspector rail: visibility, selected rail tab, and tab titles " +
+            "(Notes / Explanations / …). Read-only."
+    ) {
+        RepeaterToolHandlers.getEastSidebarState(api)
+    }
+
+    mcpTool<SetRepeaterEastSidebarVisible>(
+        "Expands or collapses the Repeater east inspector rail. Restores prior visibility after the call."
+    ) {
+        RepeaterToolHandlers.setEastSidebarVisible(api, visible)
+    }
+
+    mcpTool<SelectRepeaterEastSidebarTab>(
+        "Selects a tab on the Repeater east inspector rail (e.g. Notes, Explanations). " +
+            "Restores the prior rail tab after the call."
+    ) {
+        RepeaterToolHandlers.selectEastSidebarTab(api, railTab)
     }
 
     mcpTool<CloseRepeaterTab>(
@@ -733,6 +754,12 @@ data class ScanRepeaterNotesUi(val tabId: String, val needle: String? = null)
 
 @Serializable
 data class SetRepeaterTabNotes(val tabId: String, val notes: String)
+
+@Serializable
+data class SetRepeaterEastSidebarVisible(val visible: Boolean)
+
+@Serializable
+data class SelectRepeaterEastSidebarTab(val railTab: String)
 
 @Serializable
 data class CloseRepeaterTab(val tabId: String)

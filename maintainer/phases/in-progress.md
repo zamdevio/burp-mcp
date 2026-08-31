@@ -24,9 +24,9 @@ Everything else in Repeater (groups, target toolbar, gear settings) is **queued 
 | **Repeater context** | `get_repeater_context` | Live snapshot |
 | **Envelope** | `RepeaterToolEnvelope` on Swing Repeater tools | Post-mutation `context` |
 | **Close tabs** | `close_repeater_tab`, `close_other_repeater_tabs` | Live-smoked |
-| **Notes (attempt)** | `get/set_repeater_tab_notes`, sidebar heuristics, reflective + scanner | **`blocked`** — wrong/missing visible text |
-| **Debug** | `scan_repeater_notes_ui` | Needle + `clipboardPreview` |
-| **Fallback (interim)** | `RepeaterNotesClipboard.kt`, east rail click helpers | Demote after Annotations path |
+| **Notes** | `get/set_repeater_tab_notes` via **Annotations** | **done** (live smoke 2026.8) |
+| **East rail** | state + select + visible MCP tools | **done** (select restore smoked; collapse optional) |
+| **Debug** | `scan_repeater_notes_ui` | Swing tree scan only (no clipboard) |
 | **Docs / systems** | `state-plane.md`, ledger east-sidebar rows, this board | Maintainer only |
 | **Jar spike** | Findings summarized in phase doc; extracts under `maintainer/temp/jar-spike/` | No decompile in git |
 

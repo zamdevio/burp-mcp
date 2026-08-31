@@ -125,9 +125,9 @@ Maps **Edit group** dialog: name, color, membership checkboxes, folder on strip.
 
 | MCP tool | Capability | Path | Status | Notes |
 |----------|------------|------|--------|-------|
-| `get_repeater_tab_notes` | Read Notes panel | Swing | blocked | Swing + clipboard fallback (2026.x HTML notes) |
-| `set_repeater_tab_notes` | Replace Notes | Swing | blocked | Fail closed; verify + clipboard fallback |
-| `scan_repeater_notes_ui` | Notes UI spike / needle | Swing | done | Includes `clipboardPreview` when component scan misses |
+| `get_repeater_tab_notes` | Read Notes panel | Annotations | done | Per-tab `HttpRequestResponse.annotations()` |
+| `set_repeater_tab_notes` | Replace Notes | Annotations | done | Fail-closed verify on model |
+| `scan_repeater_notes_ui` | Notes UI spike / needle | Swing | done | Debug only; not production notes path |
 | `append_repeater_tab_notes` | Append to Notes | Swing | todo | Optional |
 
 ---
@@ -138,9 +138,9 @@ Maps **Edit group** dialog: name, color, membership checkboxes, folder on strip.
 
 | MCP tool | Capability | Path | Status | Notes |
 |----------|------------|------|--------|-------|
-| `get_repeater_east_sidebar_state` | Read rail visible + selected tab | Swing | todo | Step 2 — before mutating rail |
-| `set_repeater_east_sidebar_visible` | Collapse / expand east rail | Swing | todo | **Restore** prior collapsed state after tool |
-| `select_repeater_east_sidebar_tab` | Notes / Explanations / Custom act… | Swing | todo | **Restore** prior sidebar tab after tool |
+| `get_repeater_east_sidebar_state` | Read rail visible + selected tab | Swing | done | Step 2 |
+| `set_repeater_east_sidebar_visible` | Collapse / expand east rail | Swing | blocked | Live smoke: collapse verify fails 2026.8 — spike control |
+| `select_repeater_east_sidebar_tab` | Notes / Explanations / Custom act… | Swing | done | **Restore** prior sidebar tab after tool |
 
 ---
 

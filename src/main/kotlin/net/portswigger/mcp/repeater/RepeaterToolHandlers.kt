@@ -149,6 +149,42 @@ internal object RepeaterToolHandlers {
             }
         }
 
+    fun getEastSidebarState(api: MontoyaApi): String =
+        envelope(api) { _ ->
+            when (val result = RepeaterUiDiscovery.getEastSidebarState(api)) {
+                is RepeaterUiDiscovery.Outcome.Ok ->
+                    RepeaterUiDiscovery.Outcome.Ok(
+                        "Repeater east sidebar state" to json.encodeToJsonElement(
+                            RepeaterEastSidebar.EastSidebarState.serializer(),
+                            result.value,
+                        ),
+                    )
+                is RepeaterUiDiscovery.Outcome.Err -> RepeaterUiDiscovery.Outcome.Err(result.error)
+            }
+        }
+
+    fun setEastSidebarVisible(api: MontoyaApi, visible: Boolean): String =
+        envelope(api) { _ ->
+            when (val result = RepeaterUiDiscovery.setEastSidebarVisible(api, visible)) {
+                is RepeaterUiDiscovery.Outcome.Ok ->
+                    RepeaterUiDiscovery.Outcome.Ok(
+                        "East sidebar visible=$visible" to null,
+                    )
+                is RepeaterUiDiscovery.Outcome.Err -> RepeaterUiDiscovery.Outcome.Err(result.error)
+            }
+        }
+
+    fun selectEastSidebarTab(api: MontoyaApi, railTab: String): String =
+        envelope(api) { _ ->
+            when (val result = RepeaterUiDiscovery.selectEastSidebarTab(api, railTab)) {
+                is RepeaterUiDiscovery.Outcome.Ok ->
+                    RepeaterUiDiscovery.Outcome.Ok(
+                        "East rail tab selected: ${result.value}" to JsonPrimitive(result.value),
+                    )
+                is RepeaterUiDiscovery.Outcome.Err -> RepeaterUiDiscovery.Outcome.Err(result.error)
+            }
+        }
+
     fun closeTab(api: MontoyaApi, tabId: String): String =
         envelope(api) { _ ->
             when (val result = RepeaterUiDiscovery.closeTab(api, tabId)) {

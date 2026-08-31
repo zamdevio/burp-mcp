@@ -43,7 +43,9 @@ Creating a tab through Montoya typically **sets Target**. Pasting a request into
 | `get_active_repeater_tab` | Strip selection (suite Repeater selected) |
 | `select_repeater_tab` | Optional — select strip tab; other tools auto-select by `tab_id` |
 | `set_repeater_tab_title` | Rename |
-| `get_repeater_tab_notes` / `set_repeater_tab_notes` | Notes panel (select → settle → restore) |
+| `get_repeater_tab_notes` / `set_repeater_tab_notes` | Per-tab notes via Burp’s annotations model (select → settle → restore) |
+| `get_repeater_east_sidebar_state` | East rail visibility + selected rail tab |
+| `set_repeater_east_sidebar_visible` / `select_repeater_east_sidebar_tab` | Mutate rail; restores prior rail state after |
 | `close_repeater_tab` / `close_other_repeater_tabs` | Close one tab or all except one |
 
 Tab-targeted get/set briefly switch selection, then **restore** the prior suite/Repeater tab. A short flicker is expected.
@@ -54,10 +56,18 @@ Tab-targeted get/set briefly switch selection, then **restore** the prior suite/
 
 | Tool | Notes |
 |------|--------|
-| `get_repeater_tab_notes` | Text from the Repeater Notes panel for `tabId`; empty string if none yet |
-| `set_repeater_tab_notes` | Replace Notes for handoff to a human reviewer |
+| `get_repeater_tab_notes` | Plain text from the tab’s stored notes (Montoya `Annotations`); empty if none yet |
+| `set_repeater_tab_notes` | Replace notes for agent → human handoff |
 
-If Burp hides the Notes panel, the tool tries to open the **Notes** entry on the east inspector rail; keep that rail visible for reliable read/write. Ambiguous discovery returns a stable error (no wrong editor writes).
+Notes are **not** read from the rich-text Swing widget (2026.x HTML pane); data comes from the same model Burp uses for Proxy/history annotations. Fail-closed if the tab bundle cannot be bound.
+
+## East inspector rail
+
+| Tool | Notes |
+|------|--------|
+| `get_repeater_east_sidebar_state` | `visible`, `selectedRailTab`, `railTabs` (Inspector, Notes, Explanations, …) |
+| `select_repeater_east_sidebar_tab` | e.g. `Notes` or `Explanations`; restores prior rail tab |
+| `set_repeater_east_sidebar_visible` | Expand/collapse rail; restores prior visibility |
 
 ---
 

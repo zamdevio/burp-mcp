@@ -40,8 +40,7 @@
 
 ## Explicitly not done (do not assume in agents)
 
-- **`get_repeater_tab_notes` / `set_repeater_tab_notes`** — ledger **`blocked`** until east sidebar Step 1 passes
-- East rail visibility / rail tab MCP tools — **todo** (same phase)
+- **`append_repeater_tab_notes`** — todo (P1)
 - Repeater groups — **todo**
 
 ## Not now

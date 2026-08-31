@@ -81,6 +81,18 @@ internal object RepeaterUiDiscovery {
             DiscoveryError("<Repeater Notes editor is not editable>")
         class NotesDidNotUpdate :
             DiscoveryError("<Repeater Notes did not update; retry list_repeater_tabs then the operation>")
+        class EastSidebarNotFound :
+            DiscoveryError("<Repeater east sidebar (inspector rail) not found>")
+        class EastSidebarToggleNotFound :
+            DiscoveryError("<Repeater east sidebar collapse/expand control not found>")
+        class EastSidebarDidNotUpdate :
+            DiscoveryError("<Repeater east sidebar did not update>")
+        class InvalidEastRailTab(tab: String) :
+            DiscoveryError("<Invalid east rail tab: $tab>")
+        class EastRailTabNotFound(tab: String, available: List<String>) :
+            DiscoveryError(
+                "<East rail tab not found: $tab; available: ${available.joinToString()}>",
+            )
         class CannotCloseLastTab :
             DiscoveryError("<Cannot close the last Repeater message tab>")
         class CloseFailed(reason: String) :
@@ -283,6 +295,31 @@ internal object RepeaterUiDiscovery {
     fun closeOtherTabs(api: MontoyaApi, keepTabId: String): Outcome<String> =
         RepeaterTabClose.closeOtherTabs(api, keepTabId)
 
+    fun getEastSidebarState(api: MontoyaApi): Outcome<RepeaterEastSidebar.EastSidebarState> = runOnEdt {
+        when (val discovered = prepareRepeater(api)) {
+            is Outcome.Err -> discovered
+            is Outcome.Ok -> RepeaterEastSidebar.readState(discovered.value)
+        }
+    }
+
+    fun setEastSidebarVisible(api: MontoyaApi, visible: Boolean): Outcome<Unit> = runOnEdt {
+        when (val discovered = prepareRepeater(api)) {
+            is Outcome.Err -> discovered
+            is Outcome.Ok -> RepeaterEastSidebar.withRestore(discovered.value) {
+                RepeaterEastSidebar.setVisible(discovered.value, visible)
+            }
+        }
+    }
+
+    fun selectEastSidebarTab(api: MontoyaApi, railTab: String): Outcome<String> = runOnEdt {
+        when (val discovered = prepareRepeater(api)) {
+            is Outcome.Err -> discovered
+            is Outcome.Ok -> RepeaterEastSidebar.withRestore(discovered.value) {
+                RepeaterEastSidebar.selectRailTab(discovered.value, railTab)
+            }
+        }
+    }
+
     fun ensureRepeaterSuiteSelected(discovered: DiscoveredRepeater) {
         SuiteUiSession.ensureSuiteTabSelected(
             discovered.suiteTabbedPane,
@@ -468,16 +505,16 @@ internal object RepeaterUiDiscovery {
         }
     }
 
-    private fun readNotesWhileSelected(discovered: DiscoveredRepeater, index: Int, api: MontoyaApi): Outcome<String> =
-        RepeaterNotes.readWhileSelected(discovered, index, api)
+    private fun readNotesWhileSelected(discovered: DiscoveredRepeater, index: Int, @Suppress("UNUSED_PARAMETER") api: MontoyaApi): Outcome<String> =
+        RepeaterTabNotes.readWhileSelected(discovered, index)
 
     private fun writeNotesWhileSelected(
         discovered: DiscoveredRepeater,
         index: Int,
         tabId: String,
         notes: String,
-        api: MontoyaApi,
-    ): Outcome<String> = RepeaterNotes.writeWhileSelected(discovered, index, tabId, notes, api)
+        @Suppress("UNUSED_PARAMETER") api: MontoyaApi,
+    ): Outcome<String> = RepeaterTabNotes.writeWhileSelected(discovered, index, tabId, notes)
 
     private fun writeRequestWhileSelected(
         discovered: DiscoveredRepeater,

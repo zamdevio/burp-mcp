@@ -7,7 +7,8 @@ import javax.swing.text.JTextComponent
 import kotlinx.serialization.Serializable
 
 /**
- * Full tree scan for text-bearing components (Notes UI spike / needle calibration).
+ * Debug-only Swing scan for Notes UI calibration ([scan_repeater_notes_ui]).
+ * Production notes I/O uses [RepeaterTabNotes] / [RepeaterTabAnnotations].
  */
 internal object RepeaterNotesScanner {
 
@@ -17,8 +18,6 @@ internal object RepeaterNotesScanner {
         val messageTabId: String?,
         val sidebarNotesPanelFound: Boolean,
         val candidates: List<NotesUiCandidate>,
-        val clipboardPreview: String? = null,
-        val clipboardMatchesNeedle: Boolean = false,
     )
 
     @Serializable
@@ -68,63 +67,12 @@ internal object RepeaterNotesScanner {
             discovered.tabStrip,
             discovered.suiteFrame,
         )
-        val clipPreview = RepeaterNotesClipboard.readClipboardPreview(discovered)
         return NotesUiScanResult(
             needle = normalizedNeedle,
             messageTabId = RepeaterTabId.fromIndex(tabIndex),
             sidebarNotesPanelFound = sidebarRoot != null,
             candidates = deduped,
-            clipboardPreview = clipPreview?.take(200),
-            clipboardMatchesNeedle = normalizedNeedle != null &&
-                clipPreview?.contains(normalizedNeedle, ignoreCase = true) == true,
         )
-    }
-
-    fun sidebarContainsText(
-        discovered: RepeaterUiDiscovery.DiscoveredRepeater,
-        expected: String,
-    ): Boolean {
-        val sidebarRoot = RepeaterNotesSidebar.selectEastSidebarNotesTab(
-            discovered.repeaterRoot,
-            discovered.tabStrip,
-            discovered.suiteFrame,
-        ) ?: return false
-        val hits = mutableListOf<NotesUiCandidate>()
-        collectCandidates(
-            root = sidebarRoot,
-            tabStrip = discovered.tabStrip,
-            sidebarRoot = sidebarRoot,
-            needle = expected,
-            out = hits,
-        )
-        return hits.any { it.matchesNeedle }
-    }
-
-    fun locateInSidebar(
-        discovered: RepeaterUiDiscovery.DiscoveredRepeater,
-        messageEditors: RepeaterUiDiscovery.TabEditors,
-    ): RepeaterNotes.NotesLookup {
-        val sidebarRoot = RepeaterNotesSidebar.selectEastSidebarNotesTab(
-            discovered.repeaterRoot,
-            discovered.tabStrip,
-            discovered.suiteFrame,
-        ) ?: return RepeaterNotes.NotesLookup(null, false)
-        val handles = mutableListOf<RepeaterNotes.NotesEditorHandle>()
-        walk(sidebarRoot) { component ->
-            if (component !is Component) return@walk
-            if (RepeaterNotes.isUnderComponent(component, discovered.tabStrip)) return@walk
-            val handle = RepeaterNotesReflective.reflectiveHandle(component)
-                ?: (component as? JTextComponent)?.let { RepeaterNotes.textComponentHandle(it) }
-                ?: return@walk
-            if (messageEditors.request != null && component === messageEditors.request) return@walk
-            if (messageEditors.response != null && component === messageEditors.response) return@walk
-            val text = runCatching { handle.readText() }.getOrDefault("")
-            if (RepeaterNotes.looksLikeHttpRequest(text) || RepeaterNotes.looksLikeHttpResponse(text)) {
-                return@walk
-            }
-            handles += handle
-        }
-        return RepeaterNotes.pickNotesFromCandidates(handles)
     }
 
     private fun collectCandidates(
@@ -134,10 +82,10 @@ internal object RepeaterNotesScanner {
         needle: String?,
         out: MutableList<NotesUiCandidate>,
     ) {
-        walk(root) { component ->
-            if (RepeaterNotes.isUnderComponent(component, tabStrip)) return@walk
+        RepeaterSwingTree.walk(root) { component ->
+            if (RepeaterSwingTree.isUnderComponent(component, tabStrip)) return@walk
             val handle = RepeaterNotesReflective.reflectiveHandle(component)
-                ?: (component as? JTextComponent)?.let { RepeaterNotes.textComponentHandle(it) }
+                ?: (component as? JTextComponent)?.let { RepeaterNotesReflective.textComponentProbe(it) }
             val text = handle?.let { runCatching { it.readText() }.getOrNull() }
                 ?: probeAccessibleText(component)
             if (text.isNullOrBlank() && handle == null) return@walk
@@ -163,13 +111,12 @@ internal object RepeaterNotesScanner {
         val at = ctx.accessibleText ?: return null
         val len = at.charCount
         if (len <= 0) return null
-        return runCatching { at.getAtIndex(javax.accessibility.AccessibleText.CHARACTER, 0)?.toString() }.getOrNull()
-            ?: runCatching {
-                buildString {
-                    val end = minOf(len, 200)
-                    for (i in 0 until end) append(at.getAtIndex(javax.accessibility.AccessibleText.CHARACTER, i))
-                }
-            }.getOrNull()
+        return runCatching {
+            buildString {
+                val end = minOf(len, 200)
+                for (i in 0 until end) append(at.getAtIndex(javax.accessibility.AccessibleText.CHARACTER, i))
+            }
+        }.getOrNull()
     }
 
     private fun findAncestorScroll(component: Component): JScrollPane? {
@@ -188,14 +135,5 @@ internal object RepeaterNotesScanner {
             cur = cur.parent
         }
         return false
-    }
-
-    private fun walk(root: Component, visit: (Component) -> Unit) {
-        visit(root)
-        if (root is Container) {
-            for (child in root.components) {
-                walk(child, visit)
-            }
-        }
     }
 }
