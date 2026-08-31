@@ -48,7 +48,7 @@ internal object RepeaterNotes {
             target == null -> RepeaterUiDiscovery.Outcome.Err(
                 RepeaterUiDiscovery.DiscoveryError.NotesNotFound(),
             )
-            !target.isEditable -> RepeaterUiDiscovery.Outcome.Err(
+            !ensureWritable(target) -> RepeaterUiDiscovery.Outcome.Err(
                 RepeaterUiDiscovery.DiscoveryError.NotesNotEditable(),
             )
             else -> {
@@ -140,24 +140,26 @@ internal object RepeaterNotes {
     ): NotesLookup {
         val request = messageEditors.request
         val response = messageEditors.response
-        val candidates = collectMessageTextComponents(root)
+        val extras = collectMessageTextComponents(root)
             .filter { it !== request && it !== response }
             .filter { !looksLikeHttpRequest(it.text) }
-            .filter { !(looksLikeHttpResponse(it.text) && !it.isEditable) }
-            .filter { it.isEditable }
+            .filter { !looksLikeHttpResponse(it.text) }
 
-        return when (candidates.size) {
-            0 -> NotesLookup(null, ambiguous = false)
-            1 -> NotesLookup(candidates.single(), ambiguous = false)
-            else -> {
-                val named = candidates.filter {
+        val editable = extras.filter { it.isEditable }
+        when {
+            editable.size == 1 -> return NotesLookup(editable.single(), ambiguous = false)
+            editable.size > 1 -> {
+                val named = editable.filter {
                     it.accessibleContext?.accessibleName?.contains("note", ignoreCase = true) == true
                 }
-                when (named.size) {
+                return when (named.size) {
                     1 -> NotesLookup(named.single(), ambiguous = false)
                     else -> NotesLookup(null, ambiguous = true)
                 }
             }
+            extras.size == 1 -> return NotesLookup(extras.single(), ambiguous = false)
+            extras.size > 1 -> return NotesLookup(null, ambiguous = true)
+            else -> return NotesLookup(null, ambiguous = false)
         }
     }
 
@@ -169,6 +171,14 @@ internal object RepeaterNotes {
 
     private fun looksLikeHttpResponse(text: String): Boolean =
         text.trimStart().uppercase().startsWith("HTTP/")
+
+    /** Burp often shows Notes read-only until focused; flip editable when the component allows it. */
+    private fun ensureWritable(target: JTextComponent): Boolean {
+        if (target.isEditable) return true
+        target.isEditable = true
+        target.requestFocusInWindow()
+        return target.isEditable
+    }
 
     private val HTTP_METHODS = listOf(
         "GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "TRACE", "CONNECT",

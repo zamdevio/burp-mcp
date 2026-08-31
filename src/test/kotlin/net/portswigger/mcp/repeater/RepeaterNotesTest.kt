@@ -91,14 +91,26 @@ class RepeaterNotesTest {
             }
             assertEquals("updated", (readAgain as RepeaterUiDiscovery.Outcome.Ok).value)
         }
+
+        @Test
+        fun `write flips read-only notes field editable`() {
+            val frame = buildTreeWithNotes("seed", notesEditable = false)
+            val discovered =
+                (RepeaterUiDiscovery.discoverRepeaterFromRoot(frame) as RepeaterUiDiscovery.Outcome.Ok).value
+
+            val write = RepeaterTabSession.withTab(discovered, 0) {
+                RepeaterNotes.writeWhileSelected(discovered, 0, "repeater-tab-0", "after write")
+            }
+            assertTrue(write is RepeaterUiDiscovery.Outcome.Ok)
+        }
     }
 
-    private fun buildTreeWithNotes(notesText: String): javax.swing.JFrame {
+    private fun buildTreeWithNotes(notesText: String, notesEditable: Boolean = true): javax.swing.JFrame {
         val repeaterTabs = JTabbedPane()
         val content = JPanel(BorderLayout())
         content.add(JTextArea("GET / HTTP/1.1").also { it.isEditable = true }, BorderLayout.WEST)
         content.add(JTextArea("").also { it.isEditable = false }, BorderLayout.EAST)
-        content.add(JTextArea(notesText).also { it.isEditable = true }, BorderLayout.SOUTH)
+        content.add(JTextArea(notesText).also { it.isEditable = notesEditable }, BorderLayout.SOUTH)
         repeaterTabs.addTab("1", content)
 
         val suite = JTabbedPane()
