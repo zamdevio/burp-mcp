@@ -15,6 +15,9 @@ Receipts for contributors and agents — **check before re-implementing**.
 | 2026-08-30 | Montoya: `get_proxy_intercept_state`, `get_burp_version`, `is_in_scope` |
 | 2026-08-30 | Montoya: `include_in_scope`, `exclude_from_scope`, `get_project_info` |
 | 2026-08-31 | Repeater: `close_repeater_tab`, `close_other_repeater_tabs`; expanded tools ledger |
+| 2026-08-31 | Repeater: `get_repeater_context`; **`RepeaterToolEnvelope`** + post-mutation `context` on Swing Repeater tools |
+| 2026-08-31 | Repeater: `scan_repeater_notes_ui` (debug / needle calibration); Notes discovery spike code (get/set **not** verified — see [`phases/in-progress.md`](../phases/in-progress.md)) |
+| 2026-08-31 | Maintainer: [`phases/repeater-east-sidebar.md`](../phases/repeater-east-sidebar.md) phase slice; [`state-plane.md`](../systems/state-plane.md) east-rail restore notes |
 | 2026-08-30 | Live validation: tab list + request/response + Send/target-gate on Burp 2026.x |
 | 2026-08-30 | Maintainer scaffold: phases, systems, agents, `.cursor`, `docs/`, `scripts/` |
 

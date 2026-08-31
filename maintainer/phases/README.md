@@ -9,6 +9,7 @@
 | Doc | Role |
 |-----|------|
 | [`focus.md`](./focus.md) | **Current sprint focus** |
+| [`in-progress.md`](./in-progress.md) | **Handoff board** — active phase, landed vs blocked, new-chat prompt |
 | [`../shipped/README.md`](../shipped/README.md) | Closed work — check before re-implementing |
 
 Scratch / spikes: **`maintainer/temp/`** (gitignored).
@@ -21,6 +22,7 @@ Scratch / spikes: **`maintainer/temp/`** (gitignored).
 |-----|--------|
 | [`tools/`](./tools/README.md) | **Active** — per-area MCP tool ledgers (Repeater, Target, …) |
 | [`repeater-ui.md`](./repeater-ui.md) | **Active** — enforce select/settle/restore, Send, agent errors |
+| [`repeater-east-sidebar.md`](./repeater-east-sidebar.md) | **Active (P0)** — Notes + east rail tabs + collapse; ship before Notes `done` |
 | [`mcp-tab-ui.md`](./mcp-tab-ui.md) | **Active** — v1 Tools catalog; v2/v3 planned |
 | [`agent-guides.md`](./agent-guides.md) | **Shipped (docs)** — Cursor, Claude, generic SSE/stdio |
 | [`montoya-gaps.md`](./montoya-gaps.md) | **Pointer** — API notes; detail in [`tools/`](./tools/) |

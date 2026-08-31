@@ -1,11 +1,21 @@
 # Repeater — MCP tool ledger
 
 **Suite tab / UI:** Repeater (message tabs, Send, Target, Notes, groups, per-tab settings).  
-**Related:** [`../repeater-ui.md`](../repeater-ui.md) · user guide [`../../../docs/repeater.md`](../../../docs/repeater.md) · systems [`../../systems/repeater-ui.md`](../../systems/repeater-ui.md)
+**Related:** [`../repeater-east-sidebar.md`](../repeater-east-sidebar.md) (**P0 phase — Notes + rail**) · [`../repeater-ui.md`](../repeater-ui.md) · user guide [`../../../docs/repeater.md`](../../../docs/repeater.md) · systems [`../../systems/repeater-ui.md`](../../systems/repeater-ui.md)
 
 **Path reality:** Montoya can **create** tabs only. List / read / write / Send / Notes / groups / close / settings → **Swing** (re-discover every call; select → settle → act → restore).
 
+**Responses:** Repeater Swing tools return JSON **`RepeaterToolEnvelope`** (`ok`, `message`/`error`, live **`context`**, optional **`data`**). Cross-cutting rules: [`../../systems/suite-ui-session.md`](../../systems/suite-ui-session.md).
+
 **List responses:** Prefer returning **group id**, **tab id**, **parent group**, and **strip index** once group tools exist (today: flat `repeater-tab-N` only).
+
+---
+
+## Context (Swing)
+
+| MCP tool | Capability | Path | Status | Notes |
+|----------|------------|------|--------|-------|
+| `get_repeater_context` | Live snapshot (tabs, selection, suite focus) | Swing | done | Not cached; same `context` on every Repeater tool |
 
 ---
 
@@ -115,9 +125,22 @@ Maps **Edit group** dialog: name, color, membership checkboxes, folder on strip.
 
 | MCP tool | Capability | Path | Status | Notes |
 |----------|------------|------|--------|-------|
-| `get_repeater_tab_notes` | Read Notes panel | Swing | done | Rich text UI; MCP returns plain text |
-| `set_repeater_tab_notes` | Replace Notes | Swing | done | Read-only field → flip editable |
+| `get_repeater_tab_notes` | Read Notes panel | Swing | blocked | Swing + clipboard fallback (2026.x HTML notes) |
+| `set_repeater_tab_notes` | Replace Notes | Swing | blocked | Fail closed; verify + clipboard fallback |
+| `scan_repeater_notes_ui` | Notes UI spike / needle | Swing | done | Includes `clipboardPreview` when component scan misses |
 | `append_repeater_tab_notes` | Append to Notes | Swing | todo | Optional |
+
+---
+
+## East sidebar (Notes rail)
+
+**Phase:** [`../repeater-east-sidebar.md`](../repeater-east-sidebar.md) — ship **with** Notes data path; restore rules in [`../../systems/state-plane.md`](../../systems/state-plane.md).
+
+| MCP tool | Capability | Path | Status | Notes |
+|----------|------------|------|--------|-------|
+| `get_repeater_east_sidebar_state` | Read rail visible + selected tab | Swing | todo | Step 2 — before mutating rail |
+| `set_repeater_east_sidebar_visible` | Collapse / expand east rail | Swing | todo | **Restore** prior collapsed state after tool |
+| `select_repeater_east_sidebar_tab` | Notes / Explanations / Custom act… | Swing | todo | **Restore** prior sidebar tab after tool |
 
 ---
 
@@ -167,10 +190,10 @@ Repeater has **no built-in shared `{{cookie}}` env** per tab. MCP backlog elsewh
 
 ## Suggested implement order
 
-1. ~~Notes get/set~~
+1. **East sidebar phase** — Notes via **`Annotations`** (or approved reflection) → `get_repeater_east_sidebar_state` → rail visible/tab tools with **restore** → then mark get/set notes **`done`**
 2. ~~**`close_repeater_tab`** + **`close_other_repeater_tabs`**~~
 3. **`list_repeater_groups`** + **`create_repeater_group`** + **`edit_repeater_group`** + **`add/remove` tab**
-4. **`close_repeater_group`**, reorder, expand/collapse
+4. **`close_repeater_group`**, reorder, expand/collapse (message tab **groups**, not east rail)
 5. **`get/set_repeater_tab_target`**
 6. **`get/set_repeater_tab_settings`** (gear menu)
 7. Tab view settings, reopen closed tab (if feasible)

@@ -73,13 +73,13 @@ In prose you can write ✅ / — / ✗; in tables prefer the tokens above so age
 |-----------|---------|----------|
 | [`repeater.md`](./repeater.md) | Repeater (+ focused editors) | **Starter** |
 | [`target.md`](./target.md) | Target → Scope, Site map, Issues | **Starter** |
-| `proxy.md` | Proxy | stub when needed |
-| `intruder.md` | Intruder | stub when needed |
+| [`proxy.md`](./proxy.md) | Proxy | stub |
+| [`intruder.md`](./intruder.md) | Intruder | stub |
+| [`logger.md`](./logger.md) | Logger | stub |
 | `organizer.md` | Organizer | stub when needed |
 | `sequencer.md` | Sequencer | stub when needed |
 | `decoder.md` | Decoder | stub when needed |
 | `comparer.md` | Comparer | stub when needed |
-| `logger.md` | Logger | stub when needed |
 | `collaborator.md` | Collaborator (Pro) | stub when needed |
 | `scanner.md` | Scanner / crawl / audit (Pro) | stub when needed |
 | `http.md` | Suite-wide HTTP send / cookies / batch | stub when needed |

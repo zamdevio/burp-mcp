@@ -20,6 +20,16 @@ This file stays a **short Montoya-oriented index**. When you add or ship a tool,
 
 ---
 
+## Repeater — Montoya gap (blocks clean Notes)
+
+| Desired API | Today | MCP impact |
+|-------------|-------|------------|
+| Selected Repeater tab → `HttpRequestResponse` / **`Annotations`** | Not on public `Repeater` (only `sendToRepeater`) | `get/set_repeater_tab_notes` need Swing or **in-process reflection** until Montoya adds API |
+
+Jar spike (2026.8): notes use **`Annotations.setNotes`** internally; see [`repeater-east-sidebar.md`](./repeater-east-sidebar.md).
+
+---
+
 ## High-value Montoya still open
 
 | Montoya API | Suggested MCP tool(s) | Ledger |
@@ -39,7 +49,7 @@ Shipped recently: intercept state, burp version, scope query/include/exclude, pr
 
 | Area | Gap | Ledger |
 |------|-----|--------|
-| **Repeater** | Notes, groups, close tab | [`repeater.md`](./tools/repeater.md) |
+| **Repeater** | Tab **`Annotations`** (notes/highlight), tab list, groups; close tab partly Swing | [`repeater.md`](./tools/repeater.md) · phase [`repeater-east-sidebar.md`](./repeater-east-sidebar.md) |
 | **Target Scope table** | List/edit/remove/enable/subdomains | [`target.md`](./tools/target.md) |
 | **Intruder** | Tab list/read | `intruder.md` later |
 | **Sequencer / Logger** | No Montoya module | stub or skip |
