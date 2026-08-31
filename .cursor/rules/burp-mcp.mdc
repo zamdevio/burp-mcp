@@ -6,7 +6,7 @@ alwaysApply: true
 ## Source of truth
 - **Sprint:** `maintainer/phases/focus.md`
 - **Per-area MCP tool ledgers:** `maintainer/phases/tools/` (README + area files)
-- **Repeater / Swing UI:** `maintainer/phases/repeater-ui.md`
+- **Repeater / Swing UI:** `maintainer/phases/repeater-ui.md` · **Local Burp decompile (spikes):** `maintainer/phases/burp-ui-reference.md`
 - **Montoya index:** `maintainer/phases/montoya-gaps.md` (detail lives in `tools/`)
 - **Refactor waves:** `maintainer/phases/refactor.md`
 - **Shipped receipts:** `maintainer/shipped/README.md` (check before re-implementing)

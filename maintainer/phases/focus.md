@@ -2,19 +2,24 @@
 
 **Updated:** 2026-08-31
 
+**Burp UI (local):** RE workspace `~/Java/burp` — [`burp-ui-reference.md`](./burp-ui-reference.md) (scripts: `search.sh --save`, targeted decompile).
+
 ---
 
 ## Now
 
-1. **Repeater east sidebar phase** — Notes data (Annotations path) + rail tab select + collapse/expand, all with **restore**. **Ship before** marking Notes `done`.  
-   → [`repeater-east-sidebar.md`](./repeater-east-sidebar.md) · ledger [`tools/repeater.md`](./tools/repeater.md) · board [`in-progress.md`](./in-progress.md)
+1. **Repeater target toolbar** — fix `ensureTargetUrl` (search bar vs real Target); left-rail editor ambiguity.  
+   → [`repeater-target-toolbar.md`](./repeater-target-toolbar.md) · ledger [`tools/repeater.md`](./tools/repeater.md)
 
-2. **Live-smoke** any change to Notes / east rail / Repeater envelope tools on Burp 2026.x.
+2. **East sidebar follow-ups** — collapse (`set_repeater_east_sidebar_visible`); optional P1 append notes.
 
-## Queued (after east sidebar)
+3. **Queued:** [`repeater-ui-focus.md`](./repeater-ui-focus.md) — reduce Burp foreground/caret churn.
+
+## Queued (after target toolbar / east sidebar tail / focus)
 
 | Phase | Doc | Why |
 |-------|-----|-----|
+| Repeater **UI focus / background ops** | [`repeater-ui-focus.md`](./repeater-ui-focus.md) | IDE focus steal + caret flicker during Swing tools |
 | Repeater groups | [`tools/repeater.md`](./tools/repeater.md) | Tab organization |
 | Target scope list | [`tools/target.md`](./tools/target.md) | `list_scope_rules` spike |
 | Sitemap (+ approval) | [`tools/target.md`](./tools/target.md) · [`montoya-gaps.md`](./montoya-gaps.md) | Paginated site map |
@@ -40,6 +45,7 @@
 
 ## Explicitly not done (do not assume in agents)
 
+- **Toolbar Target** — `ensureTargetUrl` + future `get/set_repeater_tab_target` — see [`repeater-target-toolbar.md`](./repeater-target-toolbar.md)
 - **`append_repeater_tab_notes`** — todo (P1)
 - Repeater groups — **todo**
 

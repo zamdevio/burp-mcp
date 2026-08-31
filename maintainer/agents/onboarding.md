@@ -39,7 +39,7 @@ Load `build/libs/burp-mcp-all.jar` in Burp for UI work.
 
 | # | Doc |
 |---|-----|
-| 1 | [`phases/focus.md`](../phases/focus.md) |
+| 1 | [`phases/focus.md`](../phases/focus.md) (+ [`burp-ui-reference.md`](../phases/burp-ui-reference.md) for Repeater Swing spikes) |
 | 2 | [`phases/in-progress.md`](../phases/in-progress.md) — handoff / what's blocked |
 | 3 | [`phases/repeater-east-sidebar.md`](../phases/repeater-east-sidebar.md) if Notes or east rail |
 | 4 | [`phases/repeater-ui.md`](../phases/repeater-ui.md) if touching Repeater Swing |

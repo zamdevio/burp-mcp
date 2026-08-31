@@ -115,8 +115,16 @@ User guide: [`docs/repeater.md`](../../docs/repeater.md).
 
 ---
 
+## Discovery strategy
+
+1. **Montoya** when the API exposes the data (e.g. Annotations for Notes).
+2. **Local JAR decompile** — searchable tree on disk; see [`burp-ui-reference.md`](./burp-ui-reference.md). Use for new toolbar/rail/editor boundaries before writing heuristics.
+3. **Runtime Swing scan** — debug or last resort; fail closed if ambiguous.
+
+---
+
 ## Out of scope
 
-- Patching/redistributing Burp JAR, decompiling proprietary UI into repo
+- Patching/redistributing Burp JAR, decompiling proprietary UI **into this repo**
 - Repeater registry
 - Runtime discovery rule downloads from GitHub

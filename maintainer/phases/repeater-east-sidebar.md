@@ -1,9 +1,9 @@
 # Phase — Repeater east sidebar (Notes + rail)
 
-**Status:** **Active — ship this slice before marking Notes `done`.**  
+**Status:** **Tail — collapse control blocked;** Notes (Annotations) + rail **state/select** shipped.  
 **Not end-user docs.** User-facing limits stay in [`docs/repeater.md`](../../docs/repeater.md) until tools are verified.
 
-**Ledgers:** [`tools/repeater.md`](./tools/repeater.md) (tool rows) · **UI rules:** [`repeater-ui.md`](./repeater-ui.md) · **State:** [`../systems/state-plane.md`](../systems/state-plane.md) · **Jar spike (local):** `maintainer/temp/jar-spike/` (gitignored class extracts only)
+**Ledgers:** [`tools/repeater.md`](./tools/repeater.md) (tool rows) · **UI rules:** [`repeater-ui.md`](./repeater-ui.md) · **State:** [`../systems/state-plane.md`](../systems/state-plane.md) · **Burp UI reference (local decompile):** [`burp-ui-reference.md`](./burp-ui-reference.md) · **Small extracts:** `maintainer/temp/jar-spike/` (gitignored class extracts only)
 
 ---
 
@@ -22,7 +22,11 @@ We are **not** only fixing two MCP tools. The product slice is **full east-rail 
 
 ---
 
-## Why Notes are still `blocked`
+## Notes path (resolved 2026.8)
+
+**Shipped:** `RepeaterTabAnnotations` + Montoya **`Annotations`** (`notes()` / `setNotes()`). Swing clipboard/Robot path is not production.
+
+## Historical — why Swing Notes failed
 
 | Attempt | Result |
 |---------|--------|
@@ -42,16 +46,16 @@ We are **not** only fixing two MCP tools. The product slice is **full east-rail 
 
 ## Ship order (do not skip)
 
-Ship and live-smoke **in this order**. Do **not** mark `get/set_repeater_tab_notes` **`done`** until step 1 passes visual + MCP verify on Burp 2026.x.
+Ship and live-smoke **in this order**. Step 1–2 and rail **select** are green; finish **collapse** before calling this phase closed.
 
 ### Step 1 — Notes data path (P0)
 
 | Item | Status |
 |------|--------|
-| `get_repeater_tab_notes` | **blocked** — must match **visible** east Notes |
-| `set_repeater_tab_notes` | **blocked** — fail-closed verify |
+| `get_repeater_tab_notes` | **done** (Annotations; left/right inspector rail) |
+| `set_repeater_tab_notes` | **done** |
 | `scan_repeater_notes_ui` | **done** (debug only; keep for regression) |
-| Remove or gate **Robot/clipboard** behind explicit debug flag once Annotations path works | todo |
+| Remove or gate **Robot/clipboard** behind explicit debug flag | todo (low — Annotations is primary) |
 
 **Done criteria:** User types unique string in Notes → MCP get returns it → set replaces → **Burp UI** shows new text → post-mutation **`context`** in envelope.
 
@@ -59,7 +63,7 @@ Ship and live-smoke **in this order**. Do **not** mark `get/set_repeater_tab_not
 
 | MCP tool (proposed) | Capability | Status |
 |---------------------|------------|--------|
-| `get_repeater_east_sidebar_state` | `{ visible, selectedRailTab, … }` | todo |
+| `get_repeater_east_sidebar_state` | `{ visible, selectedRailTab, … }` | **done** |
 
 Agents need read before write. Optional fields discovered during spike (width collapsed, which tabs exist).
 
@@ -67,8 +71,8 @@ Agents need read before write. Optional fields discovered during spike (width co
 
 | MCP tool | Capability | Restore |
 |----------|------------|---------|
-| `set_repeater_east_sidebar_visible` | Collapse / expand rail | Prior visibility |
-| `select_repeater_east_sidebar_tab` | Notes / Explanations / Custom… | Prior rail tab |
+| `set_repeater_east_sidebar_visible` | Collapse / expand rail | **blocked** — control discovery |
+| `select_repeater_east_sidebar_tab` | Notes / Explanations / Custom… | **done** (restore) |
 
 **Rules:** Capture **full east-sidebar snapshot** at tool entry; restore in `finally` (EDT), same pattern as `RepeaterTabSession` for message tabs. Document snapshot shape in [`state-plane.md`](../systems/state-plane.md).
 

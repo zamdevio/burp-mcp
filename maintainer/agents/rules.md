@@ -16,6 +16,7 @@
 - **Never** download UI discovery rules from GitHub at runtime — strategies ship in extension JAR.
 - Swing mutations: **EDT**; select → settle → act → **restore** for tab-targeted UI ops (when enforcing).
 - Fail safe on ambiguous editors — clear agent-facing errors, not wrong mutations.
+- Repeater UI spikes: prefer **Montoya**, then **local Burp decompile** ([`burp-ui-reference.md`](../phases/burp-ui-reference.md)), not blind “any JTextField” heuristics for toolbar controls.
 
 ## Scope
 

@@ -7,28 +7,24 @@
 
 ---
 
-## Active phase (only one “now” for Repeater UI)
+## Active phase (Repeater UI)
 
 | Phase | Doc | Gate |
 |-------|-----|------|
-| **Repeater east sidebar** (Notes data + rail tabs + collapse/restore) | [`repeater-east-sidebar.md`](./repeater-east-sidebar.md) | Do **not** mark Notes `done` until this phase Step 1–3 pass live smoke |
-
-Everything else in Repeater (groups, target toolbar, gear settings) is **queued behind** this slice unless user reprioritizes.
+| **Target toolbar** | [`repeater-target-toolbar.md`](./repeater-target-toolbar.md) | Fix wrong-field auto-fill; then target MCP tools + Send re-smoke |
+| **East sidebar** (tail) | [`repeater-east-sidebar.md`](./repeater-east-sidebar.md) | Collapse control spike |
 
 ---
 
-## Landed in tree (commit-ready; verify Notes still blocked)
+## Landed in tree (recent)
 
 | Area | What | Notes |
 |------|------|--------|
-| **Repeater context** | `get_repeater_context` | Live snapshot |
-| **Envelope** | `RepeaterToolEnvelope` on Swing Repeater tools | Post-mutation `context` |
-| **Close tabs** | `close_repeater_tab`, `close_other_repeater_tabs` | Live-smoked |
-| **Notes** | `get/set_repeater_tab_notes` via **Annotations** | **done** (live smoke 2026.8) |
-| **East rail** | state + select + visible MCP tools | **done** (select restore smoked; collapse optional) |
-| **Debug** | `scan_repeater_notes_ui` | Swing tree scan only (no clipboard) |
-| **Docs / systems** | `state-plane.md`, ledger east-sidebar rows, this board | Maintainer only |
-| **Jar spike** | Findings summarized in phase doc; extracts under `maintainer/temp/jar-spike/` | No decompile in git |
+| **Notes** | `get/set_repeater_tab_notes` via **Annotations** | **done** (2026.8; works with inspector rail **left or right**) |
+| **East rail** | state + select MCP tools | **done**; visible=collapse **blocked** |
+| **Send target gate** | `TargetMissing` when unset | **done** |
+| **Send auto-fill** | `ensureTargetUrl` from Host | **blocked** — fills **search**, not Target (Health Check smoke) |
+| **Request get/set** | Swing editors | **blocked** with **left** inspector rail (ambiguous editor) |
 
 ---
 
@@ -36,19 +32,29 @@ Everything else in Repeater (groups, target toolbar, gear settings) is **queued 
 
 | Task | Owner | Next action |
 |------|-------|-------------|
-| Notes **Annotations** binding | — | Spike `Zveg`/`Zemd`-style link from selected tab; read `notes()` / `setNotes()` |
-| East sidebar **state snapshot** | — | Design `get_repeater_east_sidebar_state` fields from 2026.8 UI |
-| Rail **restore** | — | Extend session pattern from `RepeaterTabSession` |
+| **Toolbar Target** spike + fix | — | `~/Java/burp`: index strings → grep `Not specified` / Target UI → decompile candidates → fix or disable `ensureTargetUrl` |
+| Request editor + **left rail** | — | Exclude inspector editables from `pickRequestEditor` |
+| East sidebar **collapse** | — | `set_repeater_east_sidebar_visible(false)` control discovery |
 
 ---
 
-## Soon (same phase, after Notes data path)
+## Local Burp RE workspace (not in git)
+
+| Path | Role |
+|------|------|
+| `~/Java/burp/` | Scripts, `work/`, `findings/`, targeted `decompiled/` |
+| `maintainer/phases/burp-ui-reference.md` | Agent workflow + env vars |
+
+After JAR upgrade: re-run `inventory.sh` + `index-strings.sh --tier burp`. Persist hits with `search.sh --save <slug>`.
+
+---
+
+## Soon (after target toolbar)
 
 | Task | Doc row |
 |------|---------|
-| `get_repeater_east_sidebar_state` | [`repeater-east-sidebar.md`](./repeater-east-sidebar.md) Step 2 |
-| `set_repeater_east_sidebar_visible` + restore | Step 3 |
-| `select_repeater_east_sidebar_tab` + restore | Step 3 |
+| `get/set_repeater_tab_target` | [`repeater-target-toolbar.md`](./repeater-target-toolbar.md) |
+| Re-smoke Health Check: target → send → request get/set | same |
 | `append_repeater_tab_notes` | [`tools/repeater.md`](./tools/repeater.md) |
 
 ---
@@ -59,7 +65,7 @@ Everything else in Repeater (groups, target toolbar, gear settings) is **queued 
 |------|-----|
 | Repeater groups | [`tools/repeater.md`](./tools/repeater.md) |
 | Target scope list | [`tools/target.md`](./tools/target.md) |
-| `get/set_repeater_tab_target` | repeater ledger |
+| `get/set_repeater_tab_target` | [`repeater-target-toolbar.md`](./repeater-target-toolbar.md) |
 | MCP tab v2/v3 | [`mcp-tab-ui.md`](./mcp-tab-ui.md) |
 
 ---
@@ -78,7 +84,23 @@ Everything else in Repeater (groups, target toolbar, gear settings) is **queued 
 ## New chat starter prompt (copy)
 
 ```text
-Read maintainer/phases/focus.md, in-progress.md, repeater-east-sidebar.md.
-Implement Step 1 (Annotations notes path) for Burp 2026.8; then Step 2–3 east rail state + restore.
-No Repeater registry; ./gradlew test; deploy + live smoke before marking Notes done.
+burp-mcp handoff (2026-08-31):
+
+Read maintainer/phases/focus.md, in-progress.md, repeater-target-toolbar.md, burp-ui-reference.md.
+
+Active bugs (2026.8 live smoke):
+- ensureTargetUrl writes request SEARCH bar, not toolbar Target ("Not specified" still shows).
+- get/set_repeater_tab_request fails with LEFT inspector rail (ambiguous editor).
+
+Jar spike (local, outside repo):
+  cd ~/Java/burp && ./scripts/init.sh
+  ./scripts/index-strings.sh --tier burp   # if work/string-index.tsv missing
+  ./scripts/search.sh -m string -p 'Not specified' --save target-not-specified
+  ./scripts/candidates.sh --save target-candidates
+  ./scripts/decompile.sh <class> --save decompile-<name>
+
+Then fix RepeaterSend.ensureTargetUrl + request editor discovery in burp-mcp; disable auto-fill if spike inconclusive (fail-closed Send gate stays).
+
+Constraints: no Repeater registry; no decompiled Burp in git; ./gradlew test; deploy + live smoke before ledger target rows → done.
+Secondary: set_repeater_east_sidebar_visible collapse discovery (repeater-east-sidebar.md tail).
 ```

@@ -146,11 +146,14 @@ Maps **Edit group** dialog: name, color, membership checkboxes, folder on strip.
 
 ## Target URL (toolbar)
 
+**Phase:** [`../repeater-target-toolbar.md`](../repeater-target-toolbar.md) — **fix before marking target/Send auto-fill done.**
+
 | MCP tool | Capability | Path | Status | Notes |
 |----------|------------|------|--------|-------|
-| *(gate inside Send)* | Refuse Send if Target not specified | Swing | done | |
-| `get_repeater_tab_target` | Read toolbar Target | Swing | todo | |
-| `set_repeater_tab_target` | Set Target URL | Swing | todo | Avoid Configure-target modal |
+| *(gate inside Send)* | Refuse Send if Target not specified | Swing | done | Fail-closed `TargetMissing` |
+| *(implicit `ensureTargetUrl`)* | Auto-fill Target from `Host:` on Send | Swing | **blocked** | **2026.8:** writes request **search** field, not toolbar Target |
+| `get_repeater_tab_target` | Read toolbar Target | Swing | **blocked** | Depends on toolbar spike; not implemented |
+| `set_repeater_tab_target` | Set Target URL | Swing | **blocked** | Must not touch search/editor fields; avoid Configure-target modal |
 
 ---
 
@@ -190,7 +193,7 @@ Repeater has **no built-in shared `{{cookie}}` env** per tab. MCP backlog elsewh
 
 ## Suggested implement order
 
-1. **East sidebar phase** — Notes via **`Annotations`** (or approved reflection) → `get_repeater_east_sidebar_state` → rail visible/tab tools with **restore** → then mark get/set notes **`done`**
+1. **East sidebar phase** — Notes via **`Annotations`** → rail state/select → target toolbar fix → then collapse / append notes
 2. ~~**`close_repeater_tab`** + **`close_other_repeater_tabs`**~~
 3. **`list_repeater_groups`** + **`create_repeater_group`** + **`edit_repeater_group`** + **`add/remove` tab**
 4. **`close_repeater_group`**, reorder, expand/collapse (message tab **groups**, not east rail)
