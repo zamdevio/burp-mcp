@@ -8,6 +8,8 @@ import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextArea
 import javax.swing.JLabel
+import javax.swing.JEditorPane
+import javax.swing.SwingUtilities
 
 class RepeaterNotesTest {
 
@@ -26,8 +28,8 @@ class RepeaterNotesTest {
             val messageEditors = RepeaterUiDiscovery.findEditors(panel)
             val lookup = RepeaterNotes.findNotesInRoot(panel, messageEditors)
             assertFalse(lookup.ambiguous)
-            assertEquals(notes, lookup.editor)
-            assertEquals("finding: xss", lookup.editor?.text)
+            assertEquals(notes, lookup.editor?.component)
+            assertEquals("finding: xss", lookup.editor?.readText())
         }
 
         @Test
@@ -39,7 +41,7 @@ class RepeaterNotesTest {
             val messageEditors = RepeaterUiDiscovery.TabEditors(null, null, false, false)
 
             val lookup = RepeaterNotes.findNotesInRoot(inner, messageEditors)
-            assertEquals(notesArea, lookup.editor)
+            assertEquals(notesArea, lookup.editor?.component)
         }
 
         @Test
@@ -63,7 +65,7 @@ class RepeaterNotesTest {
             val messageEditors = RepeaterUiDiscovery.TabEditors(null, null, false, false)
 
             val lookup = RepeaterNotes.findNotesInRoot(panel, messageEditors)
-            assertEquals(notes, lookup.editor)
+            assertEquals(notes, lookup.editor?.component)
         }
     }
 
@@ -71,37 +73,64 @@ class RepeaterNotesTest {
     inner class SessionTests {
         @Test
         fun `read and write notes on synthetic repeater tree`() {
-            val frame = buildTreeWithNotes("agent note")
-            val discovered =
-                (RepeaterUiDiscovery.discoverRepeaterFromRoot(frame) as RepeaterUiDiscovery.Outcome.Ok).value
+            withVisibleFrame("agent note") { frame ->
+                val discovered =
+                    (RepeaterUiDiscovery.discoverRepeaterFromRoot(frame) as RepeaterUiDiscovery.Outcome.Ok).value
 
-            val read = RepeaterTabSession.withTab(discovered, 0) {
-                RepeaterNotes.readWhileSelected(discovered, 0)
-            }
-            assertTrue(read is RepeaterUiDiscovery.Outcome.Ok)
-            assertEquals("agent note", (read as RepeaterUiDiscovery.Outcome.Ok).value)
+                val read = RepeaterTabSession.withTab(discovered, 0) {
+                    RepeaterNotes.readWhileSelected(discovered, 0)
+                }
+                assertTrue(read is RepeaterUiDiscovery.Outcome.Ok)
+                assertEquals("agent note", (read as RepeaterUiDiscovery.Outcome.Ok).value)
 
-            val write = RepeaterTabSession.withTab(discovered, 0) {
-                RepeaterNotes.writeWhileSelected(discovered, 0, "repeater-tab-0", "updated")
-            }
-            assertTrue(write is RepeaterUiDiscovery.Outcome.Ok)
+                val write = RepeaterTabSession.withTab(discovered, 0) {
+                    RepeaterNotes.writeWhileSelected(discovered, 0, "repeater-tab-0", "updated")
+                }
+                assertTrue(write is RepeaterUiDiscovery.Outcome.Ok)
 
-            val readAgain = RepeaterTabSession.withTab(discovered, 0) {
-                RepeaterNotes.readWhileSelected(discovered, 0)
+                val readAgain = RepeaterTabSession.withTab(discovered, 0) {
+                    RepeaterNotes.readWhileSelected(discovered, 0)
+                }
+                assertEquals("updated", (readAgain as RepeaterUiDiscovery.Outcome.Ok).value)
             }
-            assertEquals("updated", (readAgain as RepeaterUiDiscovery.Outcome.Ok).value)
         }
 
         @Test
         fun `write flips read-only notes field editable`() {
-            val frame = buildTreeWithNotes("seed", notesEditable = false)
-            val discovered =
-                (RepeaterUiDiscovery.discoverRepeaterFromRoot(frame) as RepeaterUiDiscovery.Outcome.Ok).value
+            withVisibleFrame("seed", notesEditable = false) { frame ->
+                val discovered =
+                    (RepeaterUiDiscovery.discoverRepeaterFromRoot(frame) as RepeaterUiDiscovery.Outcome.Ok).value
 
-            val write = RepeaterTabSession.withTab(discovered, 0) {
-                RepeaterNotes.writeWhileSelected(discovered, 0, "repeater-tab-0", "after write")
+                val write = RepeaterTabSession.withTab(discovered, 0) {
+                    RepeaterNotes.writeWhileSelected(discovered, 0, "repeater-tab-0", "after write")
+                }
+                assertTrue(
+                    write is RepeaterUiDiscovery.Outcome.Ok,
+                    (write as? RepeaterUiDiscovery.Outcome.Err)?.error?.message,
+                )
             }
-            assertTrue(write is RepeaterUiDiscovery.Outcome.Ok)
+        }
+    }
+
+    private fun withVisibleFrame(
+        notesText: String,
+        notesEditable: Boolean = true,
+        block: (javax.swing.JFrame) -> Unit,
+    ) {
+        val frame = buildTreeWithNotes(notesText, notesEditable)
+        try {
+            SwingUtilities.invokeAndWait {
+                frame.pack()
+                frame.setSize(800, 600)
+                frame.isVisible = true
+                frame.validate()
+            }
+            block(frame)
+        } finally {
+            SwingUtilities.invokeAndWait {
+                frame.isVisible = false
+                frame.dispose()
+            }
         }
     }
 
@@ -110,11 +139,20 @@ class RepeaterNotesTest {
         val content = JPanel(BorderLayout())
         content.add(JTextArea("GET / HTTP/1.1").also { it.isEditable = true }, BorderLayout.WEST)
         content.add(JTextArea("").also { it.isEditable = false }, BorderLayout.EAST)
-        content.add(JTextArea(notesText).also { it.isEditable = notesEditable }, BorderLayout.SOUTH)
+        content.add(JTextArea("decoy").also { it.isEditable = notesEditable }, BorderLayout.SOUTH)
         repeaterTabs.addTab("1", content)
 
+        val notesPane = JEditorPane().also {
+            it.text = notesText
+            it.isEditable = notesEditable
+            it.preferredSize = java.awt.Dimension(220, 120)
+        }
+        val repeaterPanel = JPanel(BorderLayout())
+        repeaterPanel.add(repeaterTabs, BorderLayout.CENTER)
+        repeaterPanel.add(notesPane, BorderLayout.EAST)
+
         val suite = JTabbedPane()
-        suite.addTab("Repeater", repeaterTabs)
+        suite.addTab("Repeater", repeaterPanel)
         suite.selectedIndex = 0
         return javax.swing.JFrame().also { it.contentPane.add(suite) }
     }
