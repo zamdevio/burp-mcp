@@ -24,10 +24,11 @@ Use only on systems you are authorized to test.
 | `create_repeater_tab` | Open a new Repeater tab with an HTTP/1 request |
 | `create_repeater_tab_http2` | Same for HTTP/2 |
 
-**Inspect / control tabs (Swing — Burp UI required):**
+**Inspect / control tabs (Swing — Burp UI required; JSON envelope + `context`):**
 
 | Tool | Purpose |
 |------|---------|
+| `get_repeater_context` | Live Repeater snapshot (tabs, selection, suite focus) |
 | `list_repeater_tabs` | Ids `repeater-tab-N`, names, selection, hasRequest / hasResponse |
 | `get_repeater_tab` | Structured tab detail + messages when identifiable |
 | `get_repeater_tab_request` | Raw request text for a tab id |

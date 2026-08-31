@@ -12,6 +12,8 @@ Use only on systems you are authorized to test. Full catalog: [`tools.md`](tools
 |------|--------|
 | Source of truth | Burp’s UI — re-discover on every call |
 | Tab ids | `repeater-tab-N` (strip index). **Re-list** after close/reorder |
+| Tool responses | JSON **`RepeaterToolEnvelope`**: `ok`, `message`/`error`, live **`context`**, optional **`data`**. After mutations, **`context` in that same response is authoritative** (selected tab, tab list). |
+| Context only | `get_repeater_context` — same snapshot shape, no side effects |
 | Shared editors | Many Burp builds share one request/response editor — tools **select → settle → act → restore** |
 | Target URL | Toolbar **Target** (pencil). Distinct from the `Host:` header in the raw request |
 | Focused editor tools | `get/set_active_editor_contents` = keyboard focus anywhere — **not** the same as tab-targeted tools |
@@ -33,12 +35,13 @@ Creating a tab through Montoya typically **sets Target**. Pasting a request into
 
 | Tool | Notes |
 |------|--------|
-| `list_repeater_tabs` | id, name, selected, hasRequest / hasResponse |
+| `get_repeater_context` | Live snapshot (tabs, selection, suite focus) — not cached |
+| `list_repeater_tabs` | id, name, selected, hasRequest / hasResponse (in envelope `data`) |
 | `get_repeater_tab` | Structured detail + request/response when unique |
 | `get_repeater_tab_request` / `get_repeater_tab_response` | Raw editor text |
 | `set_repeater_tab_request` | Replace request editor (`request` + `tabId`) |
 | `get_active_repeater_tab` | Strip selection (suite Repeater selected) |
-| `select_repeater_tab` | Select strip tab (leaves selection) |
+| `select_repeater_tab` | Optional — select strip tab; other tools auto-select by `tab_id` |
 | `set_repeater_tab_title` | Rename |
 | `get_repeater_tab_notes` / `set_repeater_tab_notes` | Notes panel (select → settle → restore) |
 | `close_repeater_tab` / `close_other_repeater_tabs` | Close one tab or all except one |
@@ -54,7 +57,7 @@ Tab-targeted get/set briefly switch selection, then **restore** the prior suite/
 | `get_repeater_tab_notes` | Text from the Repeater Notes panel for `tabId`; empty string if none yet |
 | `set_repeater_tab_notes` | Replace Notes for handoff to a human reviewer |
 
-If Burp hides the Notes panel, expand it in the UI and retry. Ambiguous discovery returns a stable error (no wrong editor writes).
+If Burp hides the Notes panel, the tool tries to open the **Notes** entry on the east inspector rail; keep that rail visible for reliable read/write. Ambiguous discovery returns a stable error (no wrong editor writes).
 
 ---
 
