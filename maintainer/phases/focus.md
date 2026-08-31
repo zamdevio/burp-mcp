@@ -6,8 +6,9 @@
 
 ## Now
 
-1. **Target scope list** — `list_scope_rules` spike ([`tools/target.md`](tools/target.md))
-2. Next: `remove_scope_rule` after list spike
+1. **Repeater close** — `close_repeater_tab`, `close_other_repeater_tabs` ([`tools/repeater.md`](tools/repeater.md))
+2. **Repeater groups** — list/create/edit/add tab (Swing spike)
+3. **Target scope list** — `list_scope_rules` spike ([`tools/target.md`](tools/target.md))
 
 ## Queued
 

@@ -41,6 +41,7 @@ Creating a tab through Montoya typically **sets Target**. Pasting a request into
 | `select_repeater_tab` | Select strip tab (leaves selection) |
 | `set_repeater_tab_title` | Rename |
 | `get_repeater_tab_notes` / `set_repeater_tab_notes` | Notes panel (select → settle → restore) |
+| `close_repeater_tab` / `close_other_repeater_tabs` | Close one tab or all except one |
 
 Tab-targeted get/set briefly switch selection, then **restore** the prior suite/Repeater tab. A short flicker is expected.
 

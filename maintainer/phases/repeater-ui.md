@@ -53,6 +53,7 @@ Burp remains the **only** source of truth — re-discover on every tool call.
 | `get_repeater_tab_notes` / `set_repeater_tab_notes` | Notes panel read/write |
 | `send_repeater_tab` | Toolbar Send (`RepeaterSend`); blocks if Target not specified |
 | `send_repeater_tab_and_get_response` | Send + poll response editor |
+| `close_repeater_tab` / `close_other_repeater_tabs` | Close tab(s) via strip |
 
 **IDs:** `repeater-tab-{index}` — reorder/close invalidates; re-list before mutate.
 
@@ -90,6 +91,7 @@ User guide: [`docs/repeater.md`](../../docs/repeater.md).
 | Tool | Notes |
 |------|--------|
 | `set_repeater_tab_target` | If target field is uniquely discoverable without dialogs |
+| Groups, close, per-tab settings | Full inventory: [`tools/repeater.md`](tools/repeater.md) |
 
 ---
 

@@ -77,6 +77,10 @@ internal object RepeaterUiDiscovery {
             DiscoveryError("<Repeater Notes editor is not editable>")
         class NotesDidNotUpdate :
             DiscoveryError("<Repeater Notes did not update; retry list_repeater_tabs then the operation>")
+        class CannotCloseLastTab :
+            DiscoveryError("<Cannot close the last Repeater message tab>")
+        class CloseFailed(reason: String) :
+            DiscoveryError("<Failed to close Repeater tab: $reason>")
     }
 
     sealed class Outcome<out T> {
@@ -250,6 +254,12 @@ internal object RepeaterUiDiscovery {
             }
         }
     }
+
+    fun closeTab(api: MontoyaApi, tabId: String): Outcome<String> =
+        RepeaterTabClose.closeTab(api, tabId)
+
+    fun closeOtherTabs(api: MontoyaApi, keepTabId: String): Outcome<String> =
+        RepeaterTabClose.closeOtherTabs(api, keepTabId)
 
     // --- discovery primitives (package-visible for tests) ---
 
@@ -455,7 +465,11 @@ internal object RepeaterUiDiscovery {
         }
     }
 
-    private fun isChromeTab(strip: JTabbedPane, index: Int): Boolean {
+    private fun isChromeTab(strip: JTabbedPane, index: Int): Boolean =
+        isChromeTabIndex(strip, index)
+
+    /** Visible to tab close logic and tests. */
+    fun isChromeTabIndex(strip: JTabbedPane, index: Int): Boolean {
         val title = strip.getTitleAt(index)?.trim() ?: return true
         if (title == "+" || title.equals("new tab", ignoreCase = true)) return true
         return tabContentAt(strip, index) == null && title.isEmpty()

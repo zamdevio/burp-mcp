@@ -565,6 +565,27 @@ fun Server.registerTools(api: MontoyaApi, config: McpConfig) {
         }
     }
 
+    mcpTool<CloseRepeaterTab>(
+        "Closes one Repeater message tab by id (JTabbedPane removeTabAt). " +
+            "Refuses to close the last message tab. Response includes remaining tab count; " +
+            "call list_repeater_tabs when you need names after close/reorder."
+    ) {
+        when (val result = RepeaterUiDiscovery.closeTab(api, tabId)) {
+            is RepeaterUiDiscovery.Outcome.Ok -> result.value
+            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
+        }
+    }
+
+    mcpTool<CloseOtherRepeaterTabs>(
+        "Closes every Repeater message tab except keep_tab_id (context menu Close other tabs). " +
+            "Destructive — response includes remaining tab count; list_repeater_tabs for names."
+    ) {
+        when (val result = RepeaterUiDiscovery.closeOtherTabs(api, keepTabId)) {
+            is RepeaterUiDiscovery.Outcome.Ok -> result.value
+            is RepeaterUiDiscovery.Outcome.Err -> result.error.message
+        }
+    }
+
     mcpTool<SendRepeaterTab>(
         "Clicks the Repeater toolbar Send button for the given tab (select → settle → ensure Target → " +
             "click Send → restore). Burp 2024.x often requires a real button click (Ctrl+Enter is a no-op). " +
@@ -741,6 +762,12 @@ data class GetRepeaterTabNotes(val tabId: String)
 
 @Serializable
 data class SetRepeaterTabNotes(val tabId: String, val notes: String)
+
+@Serializable
+data class CloseRepeaterTab(val tabId: String)
+
+@Serializable
+data class CloseOtherRepeaterTabs(val keepTabId: String)
 
 @Serializable
 data class SendRepeaterTab(val tabId: String)
